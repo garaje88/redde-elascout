@@ -58,6 +58,10 @@ export async function listAthletes(
   const {
     search,
     organizationId,
+    nationality,
+    position,
+    ageRange,
+    club,
     limit = "20",
     startAfter,
   } = req.query as Record<string, string>;
@@ -66,11 +70,7 @@ export async function listAthletes(
     console.log("[listAthletes] uid=%s orgId=%s search=%s limit=%s", req.uid, organizationId, search, limit);
 
     const result = await listAthletesSvc(
-      {
-        createdBy: req.uid,
-        organizationId,
-        search,
-      },
+      { createdBy: req.uid, organizationId, search, nationality, position, ageRange, club },
       {
         limit: Math.min(parseInt(limit, 10) || 20, 100),
         startAfter,

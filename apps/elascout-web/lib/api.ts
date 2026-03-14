@@ -4,6 +4,20 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
 // ---------- Types ----------
 
+export interface ClubHistoryEntry {
+  club: string;
+  startYear: number;
+  endYear?: number;
+  position?: string;
+}
+
+export interface TitleEntry {
+  title: string;
+  year: number;
+  club?: string;
+  category?: string;
+}
+
 export interface Athlete {
   id: string;
   firstName: string;
@@ -20,6 +34,8 @@ export interface Athlete {
   weight?: number;
   currentClub?: string;
   contractEnd?: string;
+  clubHistory?: ClubHistoryEntry[];
+  titles?: TitleEntry[];
   createdBy: string;
   organizationId?: string;
   createdAt: string;
@@ -30,7 +46,23 @@ export type AthleteCreateInput = Pick<
   Athlete,
   "firstName" | "lastName" | "dateOfBirth" | "nationality"
 > &
-  Partial<Pick<Athlete, "contactEmail" | "contactPhone" | "photoURL">>;
+  Partial<
+    Pick<
+      Athlete,
+      | "contactEmail"
+      | "contactPhone"
+      | "photoURL"
+      | "position"
+      | "secondaryPosition"
+      | "preferredFoot"
+      | "height"
+      | "weight"
+      | "currentClub"
+      | "contractEnd"
+      | "clubHistory"
+      | "titles"
+    >
+  >;
 
 // ---------- Helpers ----------
 

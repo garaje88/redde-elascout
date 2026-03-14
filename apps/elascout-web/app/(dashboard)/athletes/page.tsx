@@ -1,39 +1,18 @@
 import Link from "next/link";
 import { AthletesSearch } from "./athletes-search";
-import type { Athlete } from "@/lib/api";
 
-async function fetchAthletes(): Promise<Athlete[]> {
-  try {
-    const { getAthletes } = await import("@/lib/api");
-    return await getAthletes();
-  } catch {
-    return [];
-  }
-}
+export const metadata = { title: "Deportistas — ElaScout" };
 
-export const metadata = {
-  title: "Deportistas — ElaScout",
-};
-
-export default async function AthletesPage() {
-  const athletes = await fetchAthletes();
-
+export default function AthletesPage() {
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-surface">Deportistas</h1>
-            <p className="mt-1 text-sm text-muted-light">
-              Consulta y filtra todos los deportistas registrados en el sistema.
-            </p>
-          </div>
-          <span className="rounded-full bg-dark-50 px-3 py-1 text-xs font-medium text-muted">
-            {athletes.length} registrados
-          </span>
+        <div>
+          <h1 className="text-2xl font-bold text-surface">Deportistas</h1>
+          <p className="mt-1 text-sm text-muted-light">
+            Consulta y filtra todos los deportistas registrados en el sistema.
+          </p>
         </div>
-
         <Link
           href="/athletes/new"
           className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-brand-500 px-5 py-2.5 text-sm font-semibold text-dark shadow-lg shadow-brand-500/20 transition-colors hover:bg-brand-600"
@@ -44,8 +23,7 @@ export default async function AthletesPage() {
           Nuevo deportista
         </Link>
       </div>
-
-      <AthletesSearch athletes={athletes} />
+      <AthletesSearch />
     </div>
   );
 }

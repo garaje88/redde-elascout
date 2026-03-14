@@ -42,14 +42,30 @@ export function FirebaseAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Esperar a que Firebase determine el estado actual antes de intentar sign-in
+    // Evita la race condition donde onAuthStateChanged aún no resolvió
+    if (loading) return;
+
+    // Si Auth.js no pudo refrescar el token, forzar re-login
+    if ((session as any)?.error === "RefreshAccessTokenError") {
+      nextAuthSignOut({ callbackUrl: "/auth/signin" });
+      return;
+    }
+
     const idToken = (session as any)?.idToken;
+    // Si no hay token o Firebase ya autenticó (persistencia), no hacer nada
     if (!idToken || firebaseUser) return;
 
     const credential = GoogleAuthProvider.credential(idToken);
     signInWithCredential(firebaseAuth, credential).catch((err) => {
-      console.error("[firebase-auth] signInWithCredential failed:", err);
+      if (err.code === "auth/invalid-credential") {
+        // Token de Google stale — forzar re-autenticación con token fresco
+        nextAuthSignOut({ callbackUrl: "/auth/signin" });
+      } else {
+        console.error("[firebase-auth] signInWithCredential failed:", err);
+      }
     });
-  }, [session, firebaseUser]);
+  }, [session, firebaseUser, loading]);
 
   async function getFirebaseToken(): Promise<string> {
     const user = firebaseAuth.currentUser;

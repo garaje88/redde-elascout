@@ -1,3 +1,17 @@
+export interface ClubHistoryEntry {
+  club: string;
+  startYear: number;
+  endYear?: number;
+  position?: string;
+}
+
+export interface TitleEntry {
+  title: string;
+  year: number;
+  club?: string;
+  category?: string;
+}
+
 export interface AthletePersonal {
   firstName: string;
   lastName: string;
@@ -17,6 +31,15 @@ export interface AthleteMetadata {
 
 export interface AthleteDoc extends AthletePersonal, AthleteMetadata {
   id?: string;
+  position?: string;
+  secondaryPosition?: string;
+  preferredFoot?: string;
+  height?: number;
+  weight?: number;
+  currentClub?: string;
+  contractEnd?: string;
+  clubHistory?: ClubHistoryEntry[];
+  titles?: TitleEntry[];
 }
 
 export interface CreateAthleteInput {
@@ -28,6 +51,15 @@ export interface CreateAthleteInput {
   contactPhone?: string;
   photoURL?: string;
   organizationId?: string;
+  position?: string;
+  secondaryPosition?: string;
+  preferredFoot?: string;
+  height?: number;
+  weight?: number;
+  currentClub?: string;
+  contractEnd?: string;
+  clubHistory?: ClubHistoryEntry[];
+  titles?: TitleEntry[];
 }
 
 export interface UpdateAthleteInput {
@@ -39,12 +71,25 @@ export interface UpdateAthleteInput {
   contactPhone?: string;
   photoURL?: string;
   organizationId?: string;
+  position?: string;
+  secondaryPosition?: string;
+  preferredFoot?: string;
+  height?: number;
+  weight?: number;
+  currentClub?: string;
+  contractEnd?: string;
+  clubHistory?: ClubHistoryEntry[];
+  titles?: TitleEntry[];
 }
 
 export interface AthleteFilters {
   createdBy?: string;
   organizationId?: string;
   search?: string;
+  nationality?: string;
+  position?: string;
+  ageRange?: string;
+  club?: string;
 }
 
 export interface PaginationParams {

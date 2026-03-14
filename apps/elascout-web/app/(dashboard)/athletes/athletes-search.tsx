@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import type { Athlete } from "@/lib/api";
-
-const PAGE_SIZE = 10;
+import { useFirebaseAuth } from "@/lib/firebase-auth-provider";
 
 const NATIONALITIES = [
   "Argentina", "Brasil", "Colombia", "España", "Francia",
@@ -19,12 +18,32 @@ const POSITIONS = [
 ];
 
 const AGE_RANGES = [
-  { label: "Sub-18", min: 0, max: 17 },
-  { label: "18–23 años", min: 18, max: 23 },
-  { label: "24–29 años", min: 24, max: 29 },
-  { label: "30–35 años", min: 30, max: 35 },
-  { label: "35+ años", min: 36, max: 99 },
+  { label: "Sub-18", value: "0-17" },
+  { label: "18–23 años", value: "18-23" },
+  { label: "24–29 años", value: "24-29" },
+  { label: "30–35 años", value: "30-35" },
+  { label: "35+ años", value: "36-99" },
 ];
+
+const PAGE_SIZE = 10;
+const TEXT_MIN_CHARS = 3;
+const DEBOUNCE_MS = 400;
+
+interface FilterState {
+  query: string;
+  nationality: string;
+  position: string;
+  ageRange: string;
+  club: string;
+}
+
+const EMPTY_FILTERS: FilterState = {
+  query: "",
+  nationality: "",
+  position: "",
+  ageRange: "",
+  club: "",
+};
 
 function computeAge(iso: string | undefined): number | null {
   if (!iso) return null;
@@ -44,7 +63,6 @@ function getInitials(firstName: string, lastName: string) {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
-// Colores de avatar deterministas basados en iniciales
 const AVATAR_GRADIENTS = [
   "from-brand-500 to-cyan-500",
   "from-violet-500 to-brand-500",
@@ -58,69 +76,105 @@ function getGradient(name: string): string {
   return AVATAR_GRADIENTS[idx];
 }
 
-interface AthletesSearchProps {
-  athletes: Athlete[];
-}
+const selectClass =
+  "h-10 rounded-lg border border-dark-50 bg-dark-50 px-3 text-sm text-surface transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none cursor-pointer pr-8";
 
-export function AthletesSearch({ athletes }: AthletesSearchProps) {
-  const [query, setQuery] = useState("");
-  const [nationalityFilter, setNationalityFilter] = useState("");
-  const [positionFilter, setPositionFilter] = useState("");
-  const [ageRangeFilter, setAgeRangeFilter] = useState("");
-  const [clubFilter, setClubFilter] = useState("");
+export function AthletesSearch() {
+  const { firebaseUser, getFirebaseToken, loading: authLoading } = useFirebaseAuth();
+
+  const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
+  const [athletes, setAthletes] = useState<Athlete[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
-  const filtered = useMemo(() => {
-    const q = query.toLowerCase().trim();
-    const ageRange = AGE_RANGES.find((r) => r.label === ageRangeFilter);
+  // Refs for debounce timers
+  const queryDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clubDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    return athletes.filter((a) => {
-      const matchesQuery =
-        !q ||
-        a.firstName.toLowerCase().includes(q) ||
-        a.lastName.toLowerCase().includes(q) ||
-        a.nationality?.toLowerCase().includes(q) ||
-        a.position?.toLowerCase().includes(q) ||
-        a.currentClub?.toLowerCase().includes(q) ||
-        a.contactEmail?.toLowerCase().includes(q);
+  const fetchAthletes = useCallback(
+    async (currentFilters: FilterState) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const token = await getFirebaseToken();
+        const base = `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api"}/athletes`;
+        const params = new URLSearchParams();
+        if (currentFilters.query) params.set("search", currentFilters.query);
+        if (currentFilters.nationality) params.set("nationality", currentFilters.nationality);
+        if (currentFilters.position) params.set("position", currentFilters.position);
+        if (currentFilters.ageRange) params.set("ageRange", currentFilters.ageRange);
+        if (currentFilters.club) params.set("club", currentFilters.club);
+        params.set("limit", "100");
 
-      const matchesNationality = !nationalityFilter || a.nationality === nationalityFilter;
-      const matchesPosition = !positionFilter || a.position === positionFilter;
-      const matchesClub = !clubFilter || a.currentClub?.toLowerCase().includes(clubFilter.toLowerCase());
+        const url = `${base}?${params.toString()}`;
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      const age = computeAge(a.dateOfBirth);
-      const matchesAge =
-        !ageRange ||
-        (age !== null && age >= ageRange.min && age <= ageRange.max);
+        if (!res.ok) throw new Error(`Error ${res.status}`);
 
-      return matchesQuery && matchesNationality && matchesPosition && matchesClub && matchesAge;
-    });
-  }, [athletes, query, nationalityFilter, positionFilter, ageRangeFilter, clubFilter]);
+        const data = await res.json() as { athletes: Athlete[]; hasMore: boolean };
+        setAthletes(data.athletes);
+        setPage(1);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error al cargar deportistas");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [getFirebaseToken]
+  );
 
-  // Reset page when filters change
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-
-  const hasFilters = query || nationalityFilter || positionFilter || ageRangeFilter || clubFilter;
-
-  function clearFilters() {
-    setQuery("");
-    setNationalityFilter("");
-    setPositionFilter("");
-    setAgeRangeFilter("");
-    setClubFilter("");
-    setPage(1);
-  }
-
-  function handleFilterChange(setter: (v: string) => void) {
-    return (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-      setter(e.target.value);
+  // Handlers for select filters (immediate)
+  function handleSelectChange(key: keyof FilterState) {
+    return (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value;
+      const next = { ...filters, [key]: value };
+      setFilters(next);
       setPage(1);
+      void fetchAthletes(next);
     };
   }
 
-  // Generate page numbers for pagination
+  // Handler for text inputs with debounce (0 chars or 3+ chars)
+  function handleTextChange(
+    key: "query" | "club",
+    debounceRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>
+  ) {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      const next = { ...filters, [key]: value };
+      setFilters(next);
+      setPage(1);
+
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+
+      const shouldFetch = value.length === 0 || value.length >= TEXT_MIN_CHARS;
+      if (!shouldFetch) return;
+
+      debounceRef.current = setTimeout(() => {
+        void fetchAthletes(next);
+      }, DEBOUNCE_MS);
+    };
+  }
+
+  function clearFilters() {
+    if (queryDebounceRef.current) clearTimeout(queryDebounceRef.current);
+    if (clubDebounceRef.current) clearTimeout(clubDebounceRef.current);
+    setFilters(EMPTY_FILTERS);
+    setAthletes([]);
+    setPage(1);
+  }
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(athletes.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = athletes.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const hasFilters =
+    filters.query || filters.nationality || filters.position || filters.ageRange || filters.club;
+
   function getPageNumbers(): (number | "...")[] {
     if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
     const pages: (number | "...")[] = [1];
@@ -133,8 +187,14 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
     return pages;
   }
 
-  const selectClass =
-    "h-10 rounded-lg border border-dark-50 bg-dark-50 px-3 text-sm text-surface transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none cursor-pointer pr-8";
+  // Auth loading state
+  if (authLoading || !firebaseUser) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -150,8 +210,8 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
           </svg>
           <input
             type="text"
-            value={query}
-            onChange={handleFilterChange(setQuery)}
+            value={filters.query}
+            onChange={handleTextChange("query", queryDebounceRef)}
             placeholder="Buscar por nombre o apellido..."
             className="h-10 w-full rounded-lg border border-dark-50 bg-dark-50 pl-9 pr-4 text-sm text-surface placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           />
@@ -160,8 +220,8 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
         {/* Nacionalidad */}
         <div className="relative">
           <select
-            value={nationalityFilter}
-            onChange={handleFilterChange(setNationalityFilter)}
+            value={filters.nationality}
+            onChange={handleSelectChange("nationality")}
             className={selectClass}
           >
             <option value="">Nacionalidad</option>
@@ -170,11 +230,11 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
           <svg className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
         </div>
 
-        {/* Posición (Deporte en diseño) */}
+        {/* Posición */}
         <div className="relative">
           <select
-            value={positionFilter}
-            onChange={handleFilterChange(setPositionFilter)}
+            value={filters.position}
+            onChange={handleSelectChange("position")}
             className={selectClass}
           >
             <option value="">Posición</option>
@@ -186,12 +246,12 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
         {/* Rango de edad */}
         <div className="relative">
           <select
-            value={ageRangeFilter}
-            onChange={handleFilterChange(setAgeRangeFilter)}
+            value={filters.ageRange}
+            onChange={handleSelectChange("ageRange")}
             className={selectClass}
           >
             <option value="">Rango de edad</option>
-            {AGE_RANGES.map((r) => <option key={r.label} value={r.label}>{r.label}</option>)}
+            {AGE_RANGES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
           </select>
           <svg className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
         </div>
@@ -200,8 +260,8 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
         <div className="relative">
           <input
             type="text"
-            value={clubFilter}
-            onChange={handleFilterChange(setClubFilter)}
+            value={filters.club}
+            onChange={handleTextChange("club", clubDebounceRef)}
             placeholder="Organización"
             className="h-10 w-40 rounded-lg border border-dark-50 bg-dark-50 px-3 text-sm text-surface placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           />
@@ -221,6 +281,13 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
         )}
       </div>
 
+      {/* ── Counter ── */}
+      {!isLoading && (
+        <p className="text-xs text-muted">
+          {athletes.length} deportista{athletes.length !== 1 ? "s" : ""} encontrado{athletes.length !== 1 ? "s" : ""}
+        </p>
+      )}
+
       {/* ── Table ── */}
       <div className="overflow-hidden rounded-xl border border-dark-50 bg-dark-50">
         {/* Table Header */}
@@ -234,8 +301,24 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
           <div className="w-20 shrink-0 text-center text-xs font-semibold uppercase tracking-wide text-muted">Acciones</div>
         </div>
 
-        {/* Rows */}
-        {paginated.length === 0 ? (
+        {/* Loading state */}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+            <p className="mt-3 text-xs text-muted-light">Cargando deportistas...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="text-sm font-semibold text-surface">Error al cargar</p>
+            <p className="mt-1 text-xs text-muted-light">{error}</p>
+            <button
+              onClick={() => void fetchAthletes(filters)}
+              className="mt-4 text-xs font-medium text-brand-500 hover:text-brand-400 transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : paginated.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-dark-100">
               <svg className="h-7 w-7 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -243,12 +326,12 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
               </svg>
             </div>
             <p className="text-sm font-semibold text-surface">
-              {hasFilters ? "Sin resultados" : "Sin deportistas aún"}
+              {hasFilters ? "Sin resultados" : "Usa los filtros para buscar"}
             </p>
             <p className="mt-1 text-xs text-muted-light">
               {hasFilters
                 ? "Ningún deportista coincide con los filtros aplicados."
-                : "Agrega tu primer deportista para comenzar."}
+                : "Selecciona un filtro o escribe 3+ caracteres para buscar deportistas."}
             </p>
             {hasFilters ? (
               <button
@@ -363,10 +446,10 @@ export function AthletesSearch({ athletes }: AthletesSearchProps) {
         )}
 
         {/* ── Pagination ── */}
-        {filtered.length > 0 && (
+        {!isLoading && athletes.length > 0 && (
           <div className="flex items-center justify-between border-t border-dark-100 bg-dark-100 px-5 py-3">
             <p className="text-xs text-muted">
-              Mostrando {Math.min((safePage - 1) * PAGE_SIZE + 1, filtered.length)}–{Math.min(safePage * PAGE_SIZE, filtered.length)} de {filtered.length} deportista{filtered.length !== 1 ? "s" : ""}
+              Mostrando {Math.min((safePage - 1) * PAGE_SIZE + 1, athletes.length)}–{Math.min(safePage * PAGE_SIZE, athletes.length)} de {athletes.length} deportista{athletes.length !== 1 ? "s" : ""}
             </p>
 
             <div className="flex items-center gap-1">
