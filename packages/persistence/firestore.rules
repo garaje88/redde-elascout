@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helpers
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isMemberOfOrg(orgId) {
+      return exists(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid));
+    }
+
+    function hasOrgRole(orgId, roles) {
+      let member = get(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid)).data;
+      return member.role in roles;
+    }
+
+    // Users
+    match /users/{uid} {
+      allow read: if isAuthenticated() && isOwner(uid);
+      allow create: if isAuthenticated() && isOwner(uid);
+      allow update: if isAuthenticated() && isOwner(uid);
+    }
+
+    // Athletes
+    match /athletes/{athleteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (
+        resource.data.createdBy == request.auth.uid ||
+        hasOrgRole(resource.data.organizationId, ['admin', 'coach', 'scout'])
+      );
+
+      // Evaluations subcollection
+      match /evaluations/{evalId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated();
+        allow update, delete: if isAuthenticated() && (
+          resource.data.evaluatorId == request.auth.uid ||
+          hasOrgRole(get(/databases/$(database)/documents/athletes/$(athleteId)).data.organizationId, ['admin'])
+        );
+      }
+    }
+
+    // Organizations
+    match /organizations/{orgId} {
+      allow read: if isAuthenticated() && isMemberOfOrg(orgId);
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && hasOrgRole(orgId, ['admin']);
+
+      match /members/{memberId} {
+        allow read: if isAuthenticated() && isMemberOfOrg(orgId);
+        allow write: if isAuthenticated() && hasOrgRole(orgId, ['admin']);
+      }
+    }
+  }
+}
