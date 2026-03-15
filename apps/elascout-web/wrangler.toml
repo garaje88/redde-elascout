@@ -1,0 +1,39 @@
+name = "elascout-web"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare Pages reads the output from @cloudflare/next-on-pages
+pages_build_output_dir = ".vercel/output/static"
+
+# ─── Environment variables ─────────────────────────────────────────────────────
+# Non-sensitive vars can be declared here.
+# Sensitive vars (AUTH_SECRET, etc.) must be added in the Cloudflare dashboard:
+#   Pages → elascout-web → Settings → Environment variables
+
+[vars]
+NODE_ENV = "production"
+
+# ─── Deployment instructions ───────────────────────────────────────────────────
+# 1. Install deps:
+#      npm install
+# 2. Build:
+#      npx @cloudflare/next-on-pages
+# 3. Deploy:
+#      npx wrangler pages deploy .vercel/output/static --project-name elascout-web
+#
+# OR connect to Cloudflare Pages via Git (recommended):
+#   Build command:  npx @cloudflare/next-on-pages
+#   Build output:   .vercel/output/static
+#   Node version:   20
+#
+# Required environment variables (set in Cloudflare Pages dashboard):
+#   AUTH_SECRET                        — openssl rand -base64 32
+#   AUTH_GOOGLE_ID                     — Google OAuth client ID
+#   AUTH_GOOGLE_SECRET                 — Google OAuth client secret
+#   NEXT_PUBLIC_FIREBASE_API_KEY       — Firebase Web API key
+#   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN   — e.g. myproject.firebaseapp.com
+#   NEXT_PUBLIC_FIREBASE_PROJECT_ID    — Firebase project ID
+#   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+#   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+#   NEXT_PUBLIC_FIREBASE_APP_ID
+#   NEXT_PUBLIC_API_URL                — URL of the deployed elascout-api Worker
