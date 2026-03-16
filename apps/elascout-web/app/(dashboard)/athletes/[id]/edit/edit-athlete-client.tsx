@@ -89,6 +89,7 @@ export function EditAthleteClient({ athlete }: Props) {
           contractEnd: athlete.contractEnd,
           clubHistory: athlete.clubHistory ?? [],
           titles: athlete.titles ?? [],
+          representative: athlete.representative,
         }}
         onSubmit={handleUpdate}
       />

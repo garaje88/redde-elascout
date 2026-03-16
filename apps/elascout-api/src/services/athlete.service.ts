@@ -10,17 +10,39 @@ import {
 
 const COLLECTION = "athletes";
 
-/** Convert Firestore Timestamps to ISO strings for JSON serialization */
+/** Convierte un Firestore Timestamp a string "YYYY-MM-DD" */
+function timestampToDateString(ts: unknown): string {
+  if (ts instanceof Timestamp) return ts.toDate().toISOString().split("T")[0]!;
+  if (typeof ts === "string") return ts;
+  return "";
+}
+
+/** Convert Firestore Timestamps to strings for JSON serialization */
 function serializeAthlete(
   doc: AthleteDoc & { id: string }
 ): Record<string, unknown> {
   const data: Record<string, unknown> = { ...doc };
+
+  // Timestamps de auditoría → ISO string completo
   if (data.createdAt instanceof Timestamp) {
     data.createdAt = (data.createdAt as Timestamp).toDate().toISOString();
   }
   if (data.updatedAt instanceof Timestamp) {
     data.updatedAt = (data.updatedAt as Timestamp).toDate().toISOString();
   }
+
+  // Fechas de dominio → "YYYY-MM-DD" (el seed las guardó como Timestamp)
+  if (data.dateOfBirth instanceof Timestamp || typeof data.dateOfBirth !== "string") {
+    data.dateOfBirth = timestampToDateString(data.dateOfBirth);
+  }
+  if (data.contractEnd instanceof Timestamp) {
+    data.contractEnd = timestampToDateString(data.contractEnd);
+  }
+
+  // Normalizar null → undefined para campos opcionales
+  if (data.contactEmail === null) data.contactEmail = "";
+  if (data.contactPhone === null) data.contactPhone = "";
+
   return data;
 }
 
@@ -35,8 +57,8 @@ export async function createAthlete(
     lastName: data.lastName,
     dateOfBirth: data.dateOfBirth,
     nationality: data.nationality,
-    contactEmail: data.contactEmail || null,
-    contactPhone: data.contactPhone || null,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
     photoURL: data.photoURL || null,
     organizationId: data.organizationId || null,
     position: data.position || null,
@@ -101,7 +123,6 @@ export async function listAthletes(
   }
 
   query = query.orderBy("createdAt", "desc").limit(FETCH_LIMIT);
-
   const snapshot = await query.get();
 
   let results = snapshot.docs.map((doc) =>

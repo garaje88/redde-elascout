@@ -12,11 +12,11 @@ export async function createAthlete(
   req: AuthRequest,
   res: Response
 ): Promise<void> {
-  const { firstName, lastName, dateOfBirth, nationality } = req.body;
+  const { firstName, lastName, dateOfBirth, nationality, contactEmail, contactPhone } = req.body;
 
-  if (!firstName || !lastName || !dateOfBirth || !nationality) {
+  if (!firstName || !lastName || !dateOfBirth || !nationality || !contactEmail || !contactPhone) {
     res.status(400).json({
-      error: "firstName, lastName, dateOfBirth, and nationality are required",
+      error: "firstName, lastName, dateOfBirth, nationality, contactEmail and contactPhone are required",
     });
     return;
   }
@@ -70,7 +70,7 @@ export async function listAthletes(
     console.log("[listAthletes] uid=%s orgId=%s search=%s limit=%s", req.uid, organizationId, search, limit);
 
     const result = await listAthletesSvc(
-      { createdBy: req.uid, organizationId, search, nationality, position, ageRange, club },
+      { organizationId, search, nationality, position, ageRange, club },
       {
         limit: Math.min(parseInt(limit, 10) || 20, 100),
         startAfter,

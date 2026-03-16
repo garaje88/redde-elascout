@@ -1,3 +1,10 @@
+export interface RepresentativeInfo {
+  name: string;
+  email?: string;
+  phone?: string;
+  agency?: string;
+}
+
 export interface ClubHistoryEntry {
   club: string;
   startYear: number;
@@ -17,8 +24,8 @@ export interface AthletePersonal {
   lastName: string;
   dateOfBirth: string;
   nationality: string;
-  contactEmail?: string;
-  contactPhone?: string;
+  contactEmail: string;
+  contactPhone: string;
   photoURL?: string;
 }
 
@@ -40,6 +47,7 @@ export interface AthleteDoc extends AthletePersonal, AthleteMetadata {
   contractEnd?: string;
   clubHistory?: ClubHistoryEntry[];
   titles?: TitleEntry[];
+  representative?: RepresentativeInfo;
 }
 
 export interface CreateAthleteInput {
@@ -47,8 +55,8 @@ export interface CreateAthleteInput {
   lastName: string;
   dateOfBirth: string;
   nationality: string;
-  contactEmail?: string;
-  contactPhone?: string;
+  contactEmail: string;
+  contactPhone: string;
   photoURL?: string;
   organizationId?: string;
   position?: string;
@@ -60,6 +68,7 @@ export interface CreateAthleteInput {
   contractEnd?: string;
   clubHistory?: ClubHistoryEntry[];
   titles?: TitleEntry[];
+  representative?: RepresentativeInfo;
 }
 
 export interface UpdateAthleteInput {
@@ -80,6 +89,7 @@ export interface UpdateAthleteInput {
   contractEnd?: string;
   clubHistory?: ClubHistoryEntry[];
   titles?: TitleEntry[];
+  representative?: RepresentativeInfo;
 }
 
 export interface AthleteFilters {

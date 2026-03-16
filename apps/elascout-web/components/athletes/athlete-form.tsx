@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { AthleteCreateInput, ClubHistoryEntry, TitleEntry } from "@/lib/api";
+import type { AthleteCreateInput, ClubHistoryEntry, TitleEntry, RepresentativeInfo } from "@/lib/api";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -44,6 +44,7 @@ interface FormErrors {
   dateOfBirth?: string;
   nationality?: string;
   contactEmail?: string;
+  contactPhone?: string;
   height?: string;
   weight?: string;
 }
@@ -54,9 +55,12 @@ function validate(data: Partial<AthleteCreateInput>): FormErrors {
   if (!data.lastName?.trim()) errors.lastName = "El apellido es obligatorio";
   if (!data.dateOfBirth) errors.dateOfBirth = "La fecha de nacimiento es obligatoria";
   if (!data.nationality?.trim()) errors.nationality = "La nacionalidad es obligatoria";
-  if (data.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.contactEmail)) {
+  if (!data.contactEmail?.trim()) {
+    errors.contactEmail = "El email es obligatorio";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.contactEmail)) {
     errors.contactEmail = "Email no válido";
   }
+  if (!data.contactPhone?.trim()) errors.contactPhone = "El teléfono es obligatorio";
   if (data.height !== undefined && data.height !== null) {
     const h = Number(data.height);
     if (isNaN(h) || h < 100 || h > 250) errors.height = "Estatura entre 100 y 250 cm";
@@ -486,6 +490,14 @@ function PlusIcon() {
   );
 }
 
+function AgentIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
 // ─── Main Form ────────────────────────────────────────────────────────────────
 
 interface AthleteFormProps {
@@ -511,6 +523,7 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
     contractEnd: "",
     clubHistory: [],
     titles: [],
+    representative: undefined,
     ...initialData,
   });
 
@@ -524,6 +537,17 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
     }
   }
 
+  function updateRepresentative(field: keyof RepresentativeInfo, value: string) {
+    setFormData((prev) => ({
+      ...prev,
+      representative: {
+        name: prev.representative?.name ?? "",
+        ...prev.representative,
+        [field]: value,
+      },
+    }));
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const validationErrors = validate(formData);
@@ -535,13 +559,14 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
     }
     setSubmitting(true);
     try {
+      const rep = formData.representative;
       const payload: AthleteCreateInput = {
         firstName: formData.firstName!,
         lastName: formData.lastName!,
         dateOfBirth: formData.dateOfBirth!,
         nationality: formData.nationality!,
-        contactEmail: formData.contactEmail || undefined,
-        contactPhone: formData.contactPhone || undefined,
+        contactEmail: formData.contactEmail!,
+        contactPhone: formData.contactPhone!,
         position: formData.position || undefined,
         preferredFoot: formData.preferredFoot || undefined,
         height: formData.height ? Number(formData.height) : undefined,
@@ -550,6 +575,14 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
         contractEnd: formData.contractEnd || undefined,
         clubHistory: formData.clubHistory?.length ? formData.clubHistory : undefined,
         titles: formData.titles?.length ? formData.titles : undefined,
+        representative: rep?.name?.trim()
+          ? {
+              name: rep.name.trim(),
+              ...(rep.email?.trim() && { email: rep.email.trim() }),
+              ...(rep.phone?.trim() && { phone: rep.phone.trim() }),
+              ...(rep.agency?.trim() && { agency: rep.agency.trim() }),
+            }
+          : undefined,
       };
       await onSubmit(payload);
     } catch {
@@ -595,7 +628,7 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
               Cancelar
             </Button>
             <Button type="submit" loading={submitting}>
-              {initialData ? "Guardar cambios" : "Guardar Deportista"}
+              {submitting ? "Guardando..." : initialData ? "Guardar cambios" : "Guardar Deportista"}
             </Button>
           </div>
         </div>
@@ -651,7 +684,7 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
           />
           <Input
             id="contactEmail"
-            label="Email"
+            label="Email *"
             type="email"
             placeholder="correo@ejemplo.com"
             value={formData.contactEmail}
@@ -659,12 +692,54 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
             error={errors.contactEmail}
           />
           <Input
-            label="Teléfono"
+            id="contactPhone"
+            label="Teléfono *"
             type="tel"
             placeholder="+34 600 000 000"
             value={formData.contactPhone}
             onChange={(e) => update("contactPhone", e.target.value)}
+            error={errors.contactPhone}
           />
+        </div>
+      </SectionCard>
+
+      {/* Representante */}
+      <SectionCard
+        icon={<AgentIcon />}
+        title="Representante"
+        description="Datos de contacto del agente o representante del deportista (opcional)"
+      >
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <Input
+              label="Nombre del representante"
+              placeholder="Ej. Jorge Mendes"
+              value={formData.representative?.name ?? ""}
+              onChange={(e) => updateRepresentative("name", e.target.value)}
+            />
+          </div>
+          <Input
+            label="Email"
+            type="email"
+            placeholder="representante@agencia.com"
+            value={formData.representative?.email ?? ""}
+            onChange={(e) => updateRepresentative("email", e.target.value)}
+          />
+          <Input
+            label="Teléfono"
+            type="tel"
+            placeholder="+34 600 000 000"
+            value={formData.representative?.phone ?? ""}
+            onChange={(e) => updateRepresentative("phone", e.target.value)}
+          />
+          <div className="sm:col-span-2">
+            <Input
+              label="Agencia / Empresa"
+              placeholder="Ej. Gestifute"
+              value={formData.representative?.agency ?? ""}
+              onChange={(e) => updateRepresentative("agency", e.target.value)}
+            />
+          </div>
         </div>
       </SectionCard>
 
@@ -761,7 +836,7 @@ export function AthleteForm({ initialData, onSubmit }: AthleteFormProps) {
           Cancelar
         </Button>
         <Button type="submit" loading={submitting}>
-          {initialData ? "Guardar cambios" : "Guardar Deportista"}
+          {submitting ? "Guardando..." : initialData ? "Guardar cambios" : "Guardar Deportista"}
         </Button>
       </div>
     </form>
