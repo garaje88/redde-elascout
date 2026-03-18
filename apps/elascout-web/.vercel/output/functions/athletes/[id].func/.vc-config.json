@@ -1,0 +1,18 @@
+{
+  "runtime": "edge",
+  "name": "athletes/[id]",
+  "deploymentTarget": "v8-worker",
+  "entrypoint": "index.js",
+  "assets": [],
+  "framework": {
+    "slug": "nextjs",
+    "version": "14.2.35"
+  },
+  "environment": {
+    "__NEXT_BUILD_ID": "esG_AVhUlz_hobpv9citD",
+    "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "/tYId8/9cpEGrgdPKhwOmK7krHCCVX5Mr6/tLK1ic6A=",
+    "__NEXT_PREVIEW_MODE_ID": "102e38d142cb499bfb6095716d584c71",
+    "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "af8c52811e567cc789b2997e38c0fa5b2c55698dc82c47d8a9a5de8e44d32d93",
+    "__NEXT_PREVIEW_MODE_SIGNING_KEY": "3700a1b05544c57fd64e2475890e23035746b76dcb2267c7f58f6a74da8b16e3"
+  }
+}

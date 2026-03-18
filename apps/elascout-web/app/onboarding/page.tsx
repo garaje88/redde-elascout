@@ -2,6 +2,8 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import OnboardingForm from "./onboarding-form";
 
+export const runtime = "edge";
+
 export default async function OnboardingPage() {
   const session = await auth();
 

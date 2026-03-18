@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getAthlete } from "@/lib/api";
 import { AthleteDetailView } from "./athlete-detail-view";
 
+export const runtime = "edge";
+
 export async function generateMetadata({
   params,
 }: {

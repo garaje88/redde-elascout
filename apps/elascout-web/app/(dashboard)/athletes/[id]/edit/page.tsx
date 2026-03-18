@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getAthlete } from "@/lib/api";
 import { EditAthleteClient } from "./edit-athlete-client";
 
+export const runtime = "edge";
+
 export async function generateMetadata({ params }: { params: { id: string } }) {
   try {
     const athlete = await getAthlete(params.id);

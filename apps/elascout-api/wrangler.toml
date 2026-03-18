@@ -1,9 +1,24 @@
-name = "elascout-api"
+name = "redde-elascout-api"
 main = "src/worker.ts"
 compatibility_date = "2024-09-23"
 
 # Enable Node.js built-in APIs (needed for crypto polyfills, etc.)
 compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = false
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+persist = true
+invocation_logs = true
+
+[observability.traces]
+enabled = false
+persist = true
+head_sampling_rate = 1
 
 # ─── Local development ────────────────────────────────────────────────────────
 # Run locally with: npx wrangler dev
@@ -14,14 +29,14 @@ compatibility_flags = ["nodejs_compat"]
 #   npx wrangler secret put GOOGLE_CLIENT_ID
 
 [vars]
-CORS_ORIGIN = "http://localhost:3000"
+CORS_ORIGIN = "https://elascout.garaje88.dev"
 
 # ─── Production environment ───────────────────────────────────────────────────
 [env.production]
-name = "elascout-api"
+name = "redde-elascout-api"
 
 [env.production.vars]
-CORS_ORIGIN = "https://elascout.pages.dev"
+CORS_ORIGIN = "https://elascout.garaje88.dev"
 # Set the following secrets in the Cloudflare dashboard or via wrangler:
 #   wrangler secret put FIREBASE_PROJECT_ID --env production
 #   wrangler secret put FIREBASE_CLIENT_EMAIL --env production
