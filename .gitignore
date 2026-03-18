@@ -12,6 +12,9 @@ ElaScout_Definicion_Funcional_Cliente.docx
 .next/
 out/
 
+.vercel/
+.wrangler/
+
 # Build
 dist/
 

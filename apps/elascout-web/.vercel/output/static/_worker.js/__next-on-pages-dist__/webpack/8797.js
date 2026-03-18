@@ -1,1 +1,0 @@
-var s={},c=(o,n,r)=>(s.__chunk_8797=(a,t,e)=>{"use strict";e.d(t,{Z:()=>l});let l=(0,e(8264).D)(String.raw`/mnt/c/Users/carlo/Downloads/JAVA_DEV/GARAJE88/redde_elascout/apps/elascout-web/node_modules/next/dist/esm/client/link.js#default`)},s);export{c as __getNamedExports};
