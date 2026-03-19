@@ -5,7 +5,7 @@
  * All environment variables are injected as Worker secrets via wrangler.toml.
  */
 
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
 
 import { getServiceAccountToken } from "./lib/service-account";
@@ -67,7 +67,7 @@ app.get("/api/health", (c) => c.json({ status: "ok", service: "elascout-api" }))
 // ─── Auth middleware (for protected routes) ───────────────────────────────────
 
 async function authMiddleware(
-  c: Parameters<Parameters<typeof app.use>[1]>[0],
+  c: Context<{ Bindings: Env; Variables: Variables }>,
   next: () => Promise<void>
 ) {
   const authHeader = c.req.header("Authorization");
@@ -386,6 +386,295 @@ app.post("/api/athletes/:id/evaluations", authMiddleware, async (c) => {
   } catch (err) {
     console.error("[createEvaluation]", err);
     return c.json({ error: "Failed to create evaluation" }, 500);
+  }
+});
+
+// ─── Evaluation Session routes ────────────────────────────────────────────────
+
+type EvaluationType = "personal" | "game";
+type EvaluationStatus = "active" | "completed" | "expired";
+
+interface PhysicalScores {
+  velocidad: number;
+  aceleracionCorta: number;
+  fuerzaDuelos: number;
+  resistencia: number;
+  potencia: number;
+  reaccion: number;
+  saquesLargos: number;
+  saquesCortos: number;
+}
+
+interface TechnicalScores {
+  pase: number;
+  control: number;
+  regate: number;
+  disparo: number;
+  cabecea: number;
+  presion: number;
+}
+
+interface TacticalScores {
+  posicionamiento: number;
+  marcaje: number;
+  desmarque: number;
+  transicion: number;
+}
+
+interface FieldPosition { x: number; y: number; }
+
+interface AthleteEvaluation {
+  athleteId: string;
+  team?: "home" | "away";
+  isSubstitute?: boolean;
+  fieldPosition?: FieldPosition;
+  physical?: PhysicalScores;
+  technical?: TechnicalScores;
+  tactical?: TacticalScores;
+  notes?: string;
+}
+
+interface GameFormation {
+  homeTeam: { name: string; formation: string; color: string; };
+  awayTeam: { name: string; formation: string; color: string; };
+  athletes: AthleteEvaluation[];
+}
+
+function isExpired(startedAt: string): boolean {
+  return Date.now() - new Date(startedAt).getTime() > 90 * 60 * 1000;
+}
+
+// POST /api/evaluations — crear sesión de evaluación
+app.post("/api/evaluations", authMiddleware, async (c) => {
+  const uid = c.get("uid");
+  const db = c.get("db");
+  const body = await c.req.json<{ type?: string; title?: string; notes?: string }>();
+
+  if (!body.type || !body.title) {
+    return c.json({ error: "type and title are required" }, 400);
+  }
+  if (body.type !== "personal" && body.type !== "game") {
+    return c.json({ error: "type must be 'personal' or 'game'" }, 400);
+  }
+
+  try {
+    const id = db.newId();
+    const now = new Date().toISOString();
+    const evaluation = {
+      type: body.type as EvaluationType,
+      title: body.title,
+      notes: body.notes ?? null,
+      status: "active" as EvaluationStatus,
+      createdBy: uid,
+      organizationId: null,
+      formation: null,
+      startedAt: now,
+      closedAt: null,
+      createdAt: SERVER_TIMESTAMP,
+      updatedAt: SERVER_TIMESTAMP,
+    };
+    const created = await db.setDoc("evaluations", id, evaluation);
+    return c.json({ evaluation: { id, ...created } }, 201);
+  } catch (err) {
+    console.error("[createEvaluationSession]", err);
+    return c.json({ error: "Failed to create evaluation" }, 500);
+  }
+});
+
+// GET /api/evaluations — listar evaluaciones del usuario
+app.get("/api/evaluations", authMiddleware, async (c) => {
+  const uid = c.get("uid");
+  const db = c.get("db");
+  const { status } = c.req.query();
+
+  try {
+    const filters: Array<{ field: string; op: string; value: unknown }> = [
+      { field: "createdBy", op: "==", value: uid },
+    ];
+    let results = await db.query(
+      "evaluations",
+      filters,
+      [{ field: "createdAt", direction: "DESCENDING" }],
+      200
+    );
+
+    // Virtual expiry: mark active evaluations as expired in the response
+    results = results.map((ev) => {
+      if (
+        ev.status === "active" &&
+        typeof ev.startedAt === "string" &&
+        isExpired(ev.startedAt)
+      ) {
+        return { ...ev, status: "expired" };
+      }
+      return ev;
+    });
+
+    if (status) {
+      results = results.filter((ev) => ev.status === status);
+    }
+
+    return c.json({ evaluations: results });
+  } catch (err) {
+    console.error("[listEvaluationSessions]", err);
+    return c.json({ error: "Failed to list evaluations" }, 500);
+  }
+});
+
+// GET /api/evaluations/:id
+app.get("/api/evaluations/:id", authMiddleware, async (c) => {
+  const { id } = c.req.param();
+  const uid = c.get("uid");
+  const db = c.get("db");
+
+  try {
+    const ev = await db.getDoc("evaluations", id);
+    if (!ev) return c.json({ error: "Evaluation not found" }, 404);
+    if (ev.createdBy !== uid) return c.json({ error: "Not authorized" }, 403);
+
+    // Virtual expiry
+    const evaluation =
+      ev.status === "active" &&
+      typeof ev.startedAt === "string" &&
+      isExpired(ev.startedAt)
+        ? { ...ev, status: "expired" }
+        : ev;
+
+    return c.json({ evaluation: { id, ...evaluation } });
+  } catch (err) {
+    console.error("[getEvaluationSession]", err);
+    return c.json({ error: "Failed to get evaluation" }, 500);
+  }
+});
+
+// PUT /api/evaluations/:id — actualizar estado/notas
+app.put("/api/evaluations/:id", authMiddleware, async (c) => {
+  const { id } = c.req.param();
+  const uid = c.get("uid");
+  const db = c.get("db");
+
+  try {
+    const ev = await db.getDoc("evaluations", id);
+    if (!ev) return c.json({ error: "Evaluation not found" }, 404);
+    if (ev.createdBy !== uid) return c.json({ error: "Not authorized" }, 403);
+
+    const body = await c.req.json<Record<string, unknown>>();
+    // Prevent overwriting protected fields
+    const { id: _id, createdBy: _cb, createdAt: _ca, ...safe } = body;
+    void _id; void _cb; void _ca;
+
+    const updated = await db.updateDoc("evaluations", id, {
+      ...safe,
+      updatedAt: SERVER_TIMESTAMP,
+    });
+    return c.json({ evaluation: { id, ...updated } });
+  } catch (err) {
+    console.error("[updateEvaluationSession]", err);
+    return c.json({ error: "Failed to update evaluation" }, 500);
+  }
+});
+
+// DELETE /api/evaluations/:id
+app.delete("/api/evaluations/:id", authMiddleware, async (c) => {
+  const { id } = c.req.param();
+  const uid = c.get("uid");
+  const db = c.get("db");
+
+  try {
+    const ev = await db.getDoc("evaluations", id);
+    if (!ev) return c.json({ error: "Evaluation not found" }, 404);
+    if (ev.createdBy !== uid) return c.json({ error: "Not authorized" }, 403);
+
+    await db.deleteDoc("evaluations", id);
+    return new Response(null, { status: 204 });
+  } catch (err) {
+    console.error("[deleteEvaluationSession]", err);
+    return c.json({ error: "Failed to delete evaluation" }, 500);
+  }
+});
+
+// PUT /api/evaluations/:id/formation — guardar formación completa
+app.put("/api/evaluations/:id/formation", authMiddleware, async (c) => {
+  const { id } = c.req.param();
+  const uid = c.get("uid");
+  const db = c.get("db");
+
+  try {
+    const ev = await db.getDoc("evaluations", id);
+    if (!ev) return c.json({ error: "Evaluation not found" }, 404);
+    if (ev.createdBy !== uid) return c.json({ error: "Not authorized" }, 403);
+    if (ev.type !== "game") return c.json({ error: "Only game evaluations have formations" }, 400);
+
+    const formation = await c.req.json<GameFormation>();
+    await db.updateDoc("evaluations", id, {
+      formation,
+      updatedAt: SERVER_TIMESTAMP,
+    });
+    return c.json({ ok: true });
+  } catch (err) {
+    console.error("[saveFormation]", err);
+    return c.json({ error: "Failed to save formation" }, 500);
+  }
+});
+
+// GET /api/evaluations/:id/formation
+app.get("/api/evaluations/:id/formation", authMiddleware, async (c) => {
+  const { id } = c.req.param();
+  const uid = c.get("uid");
+  const db = c.get("db");
+
+  try {
+    const ev = await db.getDoc("evaluations", id);
+    if (!ev) return c.json({ error: "Evaluation not found" }, 404);
+    if (ev.createdBy !== uid) return c.json({ error: "Not authorized" }, 403);
+
+    return c.json({ formation: ev.formation ?? null });
+  } catch (err) {
+    console.error("[getFormation]", err);
+    return c.json({ error: "Failed to get formation" }, 500);
+  }
+});
+
+// PUT /api/evaluations/:id/athletes/:athleteId/scores
+app.put("/api/evaluations/:id/athletes/:athleteId/scores", authMiddleware, async (c) => {
+  const { id, athleteId } = c.req.param();
+  const uid = c.get("uid");
+  const db = c.get("db");
+
+  try {
+    const ev = await db.getDoc("evaluations", id);
+    if (!ev) return c.json({ error: "Evaluation not found" }, 404);
+    if (ev.createdBy !== uid) return c.json({ error: "Not authorized" }, 403);
+
+    const scores = await c.req.json<AthleteEvaluation>();
+    const saved = await db.setDoc(`evaluations/${id}/athleteScores`, athleteId, {
+      ...scores,
+      athleteId,
+      updatedAt: SERVER_TIMESTAMP,
+    });
+    return c.json({ scores: { athleteId, ...saved } });
+  } catch (err) {
+    console.error("[saveAthleteScores]", err);
+    return c.json({ error: "Failed to save athlete scores" }, 500);
+  }
+});
+
+// GET /api/evaluations/:id/athletes/:athleteId/scores
+app.get("/api/evaluations/:id/athletes/:athleteId/scores", authMiddleware, async (c) => {
+  const { id, athleteId } = c.req.param();
+  const uid = c.get("uid");
+  const db = c.get("db");
+
+  try {
+    const ev = await db.getDoc("evaluations", id);
+    if (!ev) return c.json({ error: "Evaluation not found" }, 404);
+    if (ev.createdBy !== uid) return c.json({ error: "Not authorized" }, 403);
+
+    const scores = await db.getDoc(`evaluations/${id}/athleteScores`, athleteId);
+    return c.json({ scores: scores ?? null });
+  } catch (err) {
+    console.error("[getAthleteScores]", err);
+    return c.json({ error: "Failed to get athlete scores" }, 500);
   }
 });
 

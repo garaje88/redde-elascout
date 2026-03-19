@@ -70,6 +70,7 @@ export async function createAthlete(
     contractEnd: data.contractEnd || null,
     clubHistory: data.clubHistory ?? [],
     titles: data.titles ?? [],
+    representative: data.representative ?? null,
     createdBy: uid,
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
@@ -206,8 +207,13 @@ export async function updateAthlete(
 
   const existing = doc.data() as AthleteDoc;
 
-  if (existing.createdBy !== uid) {
-    throw new Error("FORBIDDEN");
+  // Block only if athlete belongs to a different organization
+  if (existing.organizationId) {
+    const callerDoc = await db.collection("users").doc(uid).get();
+    const callerOrgId = callerDoc.exists ? (callerDoc.data()?.organizationId as string | undefined) : undefined;
+    if (callerOrgId !== existing.organizationId) {
+      throw new Error("FORBIDDEN");
+    }
   }
 
   const updateData: Record<string, unknown> = {
@@ -235,8 +241,13 @@ export async function deleteAthlete(
 
   const existing = doc.data() as AthleteDoc;
 
-  if (existing.createdBy !== uid) {
-    throw new Error("FORBIDDEN");
+  // Block only if athlete belongs to a different organization
+  if (existing.organizationId) {
+    const callerDoc = await db.collection("users").doc(uid).get();
+    const callerOrgId = callerDoc.exists ? (callerDoc.data()?.organizationId as string | undefined) : undefined;
+    if (callerOrgId !== existing.organizationId) {
+      throw new Error("FORBIDDEN");
+    }
   }
 
   await docRef.delete();

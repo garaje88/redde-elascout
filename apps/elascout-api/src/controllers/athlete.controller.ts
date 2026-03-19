@@ -7,6 +7,7 @@ import {
   updateAthlete as updateAthleteSvc,
   deleteAthlete as deleteAthleteSvc,
 } from "../services/athlete.service";
+import { getAthleteEvaluationList } from "../services/evaluation.service";
 
 export async function createAthlete(
   req: AuthRequest,
@@ -132,5 +133,19 @@ export async function deleteAthlete(
     }
     console.error("[deleteAthlete] id=%s uid=%s error:", id, req.uid, err);
     res.status(500).json({ error: "Failed to delete athlete" });
+  }
+}
+
+export async function getAthleteEvaluations(
+  req: AuthRequest,
+  res: Response
+): Promise<void> {
+  const { id } = req.params;
+  try {
+    const evaluations = await getAthleteEvaluationList(id as string);
+    res.json({ evaluations });
+  } catch (err) {
+    console.error("[getAthleteEvaluations] id=%s error:", id, err);
+    res.status(500).json({ error: "Failed to get athlete evaluations" });
   }
 }

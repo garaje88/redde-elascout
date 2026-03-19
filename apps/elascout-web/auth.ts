@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import type { DefaultSession } from "next-auth";
+import { authConfig } from "./auth.config";
 
 declare module "next-auth" {
   interface Session {
@@ -43,7 +44,7 @@ async function refreshGoogleToken(token: any) {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true,
+  ...authConfig,
   secret: process.env.AUTH_SECRET,
   providers: [
     Google({
@@ -57,15 +58,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  pages: {
-    signIn: "/auth/signin",
-  },
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
       }
-      // Login inicial: guarda tokens y tiempo de expiración
       if (account) {
         return {
           ...token,
@@ -75,11 +73,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           accessTokenExpires: Date.now() + ((account.expires_in as number) ?? 3600) * 1000,
         };
       }
-      // Token vigente — devolver sin cambios
       if (Date.now() < (token.accessTokenExpires as number)) {
         return token;
       }
-      // Token expirado — refrescar automáticamente
       return refreshGoogleToken(token);
     },
     async session({ session, token }) {
@@ -90,9 +86,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       (session as any).accessToken = token.accessToken;
       (session as any).error = token.error;
       return session;
-    },
-    async authorized({ auth }) {
-      return !!auth;
     },
   },
   session: {

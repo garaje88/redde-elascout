@@ -16,7 +16,7 @@ export default function DashboardLayout({
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main content area — offset by sidebar width on desktop */}
-      <div className="lg:pl-60">
+      <div className="lg:pl-[220px]">
         <Header onMenuToggle={() => setSidebarOpen((o) => !o)} />
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {children}

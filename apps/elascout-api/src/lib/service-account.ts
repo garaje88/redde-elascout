@@ -71,7 +71,7 @@ async function importPrivateKey(pem: string): Promise<CryptoKey> {
     bytes[i] = binary.charCodeAt(i);
   }
 
-  const keyBuffer = isPkcs1 ? pkcs1ToPkcs8(bytes).buffer : bytes.buffer;
+  const keyBuffer = (isPkcs1 ? pkcs1ToPkcs8(bytes).buffer : bytes.buffer) as ArrayBuffer;
 
   return crypto.subtle.importKey(
     "pkcs8",
@@ -82,8 +82,8 @@ async function importPrivateKey(pem: string): Promise<CryptoKey> {
   );
 }
 
-function base64url(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
+function base64url(buffer: ArrayBuffer | Uint8Array): string {
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
   let str = "";
   for (const b of bytes) str += String.fromCharCode(b);
   return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");

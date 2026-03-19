@@ -9,36 +9,50 @@ const navItems = [
   {
     label: "Dashboard",
     href: "/",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+    icon: (active: boolean) => (
+      <svg className={`h-[18px] w-[18px] ${active ? "text-emerald-400" : "text-slate-400"}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <rect width="7" height="9" x="3" y="3" rx="1" />
+        <rect width="7" height="5" x="14" y="3" rx="1" />
+        <rect width="7" height="9" x="14" y="12" rx="1" />
+        <rect width="7" height="5" x="3" y="16" rx="1" />
       </svg>
     ),
   },
   {
     label: "Deportistas",
     href: "/athletes",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+    icon: (active: boolean) => (
+      <svg className={`h-[18px] w-[18px] ${active ? "text-emerald-400" : "text-slate-400"}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
   },
   {
     label: "Evaluaciones",
-    href: "#",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+    href: "/evaluations",
+    icon: (active: boolean) => (
+      <svg className={`h-[18px] w-[18px] ${active ? "text-emerald-400" : "text-slate-400"}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+        <path d="m9 14 2 2 4-4" />
       </svg>
     ),
   },
   {
     label: "Organizaciones",
     href: "#",
-    icon: (
-      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5M3.75 3v18m16.5-18v18M5.25 3h13.5M5.25 21h13.5M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+    icon: (active: boolean) => (
+      <svg className={`h-[18px] w-[18px] ${active ? "text-emerald-400" : "text-slate-400"}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+        <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+        <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+        <path d="M10 6h4" />
+        <path d="M10 10h4" />
+        <path d="M10 14h4" />
+        <path d="M10 18h4" />
       </svg>
     ),
   },
@@ -60,47 +74,42 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
   const sidebarContent = (
     <div
-      className={`flex h-full flex-col bg-dark-200 transition-all duration-200 ${
-        collapsed ? "w-[68px]" : "w-60"
+      className={`flex h-full flex-col transition-all duration-200 ${
+        collapsed ? "w-[68px]" : "w-[220px]"
       }`}
+      style={{ backgroundColor: "#0B0F14" }}
     >
-      {/* Logo */}
-      <div className="flex h-16 items-center justify-between px-4">
-        {collapsed ? (
+      {/* Logo area */}
+      <div className={`flex items-center justify-between px-4 py-5 ${collapsed ? "flex-col gap-3 px-2" : ""}`}>
+        <div className={`flex items-center gap-2 ${collapsed ? "justify-center" : ""}`}>
           <Image
             src="/assets/images/ElaScout-Icon.svg"
             alt="ElaScout"
-            width={32}
-            height={32}
+            width={28}
+            height={28}
+            className="shrink-0 rounded-md"
           />
-        ) : (
-          <Image
-            src="/assets/images/ElaScout-Logo-Dark.svg"
-            alt="ElaScout"
-            width={140}
-            height={32}
-          />
-        )}
-        {/* Collapse toggle — hidden on mobile */}
+          {!collapsed && (
+            <span className="text-base font-bold text-white tracking-tight">
+              Ela Scout
+            </span>
+          )}
+        </div>
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="hidden rounded-md p-1 text-muted hover:bg-dark-50 hover:text-surface lg:block"
+          className="hidden shrink-0 rounded p-1 text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300 lg:block"
           aria-label={collapsed ? "Expandir sidebar" : "Colapsar sidebar"}
         >
-          <svg
-            className={`h-4 w-4 transition-transform ${collapsed ? "rotate-180" : ""}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          <svg className={`h-[18px] w-[18px] transition-transform ${collapsed ? "rotate-180" : ""}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+            <path d="M9 3v18" />
+            <path d="m16 15-3-3 3-3" />
           </svg>
         </button>
       </div>
 
-      {/* Nav */}
-      <nav className="mt-4 flex-1 space-y-1 px-2">
+      {/* Nav section */}
+      <nav className={`mt-2 flex-1 space-y-1 ${collapsed ? "px-2" : "px-3"}`}>
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
@@ -108,19 +117,35 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               key={item.label}
               href={item.href}
               onClick={onClose}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`group flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm transition-colors ${
                 active
-                  ? "bg-brand-500/10 text-brand-500"
-                  : "text-muted-light hover:bg-dark-50 hover:text-surface"
-              } ${collapsed ? "justify-center" : ""}`}
+                  ? "font-semibold text-white"
+                  : "font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200"
+              } ${collapsed ? "justify-center px-2" : ""}`}
+              style={active ? { backgroundColor: "#0F3D2E" } : undefined}
               title={collapsed ? item.label : undefined}
             >
-              {item.icon}
+              {item.icon(active)}
               {!collapsed && <span>{item.label}</span>}
             </Link>
           );
         })}
       </nav>
+
+      {/* Bottom section — version badge */}
+      <div className={`border-t border-white/5 p-4 ${collapsed ? "px-2" : ""}`}>
+        {!collapsed && (
+          <div className="flex items-center gap-2 rounded-md px-3 py-2">
+            <div className="h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="text-xs text-slate-500">ElaScout v1.0</span>
+          </div>
+        )}
+        {collapsed && (
+          <div className="flex justify-center">
+            <div className="h-2 w-2 rounded-full bg-emerald-400" />
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -135,11 +160,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
-            className="fixed inset-0 bg-black/60"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
             aria-hidden
           />
-          <aside className="fixed inset-y-0 left-0 z-50">
+          <aside className="fixed inset-y-0 left-0 z-50 shadow-2xl shadow-black/50">
             {sidebarContent}
           </aside>
         </div>

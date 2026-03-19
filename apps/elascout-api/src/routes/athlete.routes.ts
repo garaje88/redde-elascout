@@ -6,6 +6,7 @@ import {
   listAthletes,
   updateAthlete,
   deleteAthlete,
+  getAthleteEvaluations,
 } from "../controllers/athlete.controller";
 
 export const athleteRouter = Router();
@@ -17,3 +18,4 @@ athleteRouter.get("/", listAthletes);
 athleteRouter.get("/:id", getAthlete);
 athleteRouter.put("/:id", updateAthlete);
 athleteRouter.delete("/:id", deleteAthlete);
+athleteRouter.get("/:id/evaluations", getAthleteEvaluations);

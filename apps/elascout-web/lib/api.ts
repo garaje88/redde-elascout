@@ -44,6 +44,10 @@ export interface Athlete {
   clubHistory?: ClubHistoryEntry[];
   titles?: TitleEntry[];
   representative?: RepresentativeInfo;
+  physicalAvg?: PhysicalScores;
+  technicalAvg?: TechnicalScores;
+  tacticalAvg?: TacticalScores;
+  evaluationCount?: number;
   createdBy: string;
   organizationId?: string;
   createdAt: string;
@@ -142,4 +146,144 @@ export async function updateAthlete(
 
 export async function deleteAthlete(id: string): Promise<void> {
   await request<void>(`/athletes/${id}`, { method: "DELETE" });
+}
+
+// ---------- Evaluation Types ----------
+
+export type EvaluationType = "personal" | "game";
+export type EvaluationStatus = "active" | "completed" | "expired";
+
+export interface PhysicalScores {
+  velocidad: number;
+  aceleracionCorta: number;
+  fuerzaDuelos: number;
+  resistencia: number;
+  potencia: number;
+  reaccion: number;
+  saquesLargos: number;
+  saquesCortos: number;
+}
+
+export interface TechnicalScores {
+  pase: number;
+  control: number;
+  regate: number;
+  disparo: number;
+  cabecea: number;
+  presion: number;
+}
+
+export interface TacticalScores {
+  posicionamiento: number;
+  marcaje: number;
+  desmarque: number;
+  transicion: number;
+}
+
+export interface FieldPosition {
+  x: number;
+  y: number;
+}
+
+export interface AthleteEvaluation {
+  athleteId: string;
+  name?: string;
+  initials?: string;
+  position?: string;
+  team?: "home" | "away";
+  isSubstitute?: boolean;
+  fieldPosition?: FieldPosition;
+  physical?: PhysicalScores;
+  technical?: TechnicalScores;
+  tactical?: TacticalScores;
+  notes?: string;
+}
+
+export interface GameFormation {
+  homeTeam: { name: string; formation: string; color: string };
+  awayTeam: { name: string; formation: string; color: string };
+  athletes: AthleteEvaluation[];
+}
+
+export interface Evaluation {
+  id: string;
+  type: EvaluationType;
+  status: EvaluationStatus;
+  title: string;
+  createdBy: string;
+  organizationId?: string;
+  formation?: GameFormation;
+  athletes?: AthleteEvaluation[];
+  startedAt: string;
+  closedAt?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EvaluationCreateInput = {
+  type: EvaluationType;
+  title: string;
+  notes?: string;
+};
+
+// ---------- Evaluations API ----------
+
+export async function getEvaluations(status?: EvaluationStatus): Promise<Evaluation[]> {
+  const qs = status ? `?status=${status}` : "";
+  const data = await request<{ evaluations: Evaluation[] }>(`/evaluations${qs}`);
+  return data.evaluations;
+}
+
+export async function getEvaluation(id: string): Promise<Evaluation> {
+  const data = await request<{ evaluation: Evaluation }>(`/evaluations/${id}`);
+  return data.evaluation;
+}
+
+export async function createEvaluation(data: EvaluationCreateInput): Promise<Evaluation> {
+  const res = await request<{ evaluation: Evaluation }>("/evaluations", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return res.evaluation;
+}
+
+export async function updateEvaluation(id: string, data: Partial<Evaluation>): Promise<Evaluation> {
+  const res = await request<{ evaluation: Evaluation }>(`/evaluations/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+  return res.evaluation;
+}
+
+export async function deleteEvaluation(id: string): Promise<void> {
+  await request<void>(`/evaluations/${id}`, { method: "DELETE" });
+}
+
+export async function saveFormation(id: string, formation: GameFormation): Promise<void> {
+  await request<{ ok: boolean }>(`/evaluations/${id}/formation`, {
+    method: "PUT",
+    body: JSON.stringify(formation),
+  });
+}
+
+export async function saveAthleteScores(
+  evalId: string,
+  athleteId: string,
+  scores: AthleteEvaluation
+): Promise<void> {
+  await request<{ scores: AthleteEvaluation }>(
+    `/evaluations/${evalId}/athletes/${athleteId}/scores`,
+    { method: "PUT", body: JSON.stringify(scores) }
+  );
+}
+
+export async function getAthleteScores(
+  evalId: string,
+  athleteId: string
+): Promise<AthleteEvaluation | null> {
+  const data = await request<{ scores: AthleteEvaluation | null }>(
+    `/evaluations/${evalId}/athletes/${athleteId}/scores`
+  );
+  return data.scores;
 }

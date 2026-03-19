@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { authRouter } from "./routes/auth.routes";
 import { athleteRouter } from "./routes/athlete.routes";
+import { evaluationRouter } from "./routes/evaluation.routes";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,6 +18,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/athletes", athleteRouter);
+app.use("/api/evaluations", evaluationRouter);
 
 app.listen(PORT, () => {
   console.log(`[elascout-api] Running on http://localhost:${PORT}`);

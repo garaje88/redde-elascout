@@ -12,6 +12,9 @@ pages_build_output_dir = ".vercel/output/static"
 
 [vars]
 NODE_ENV = "production"
+# AUTH_URL must be set in Cloudflare Pages dashboard (Settings → Environment variables)
+# Value: https://elascout.garaje88.dev
+# Do NOT put it here — wrangler.toml [vars] are injected into local dev via setupDevPlatform()
 
 # ─── Deployment instructions ───────────────────────────────────────────────────
 # 1. Install deps:

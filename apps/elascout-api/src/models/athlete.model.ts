@@ -36,6 +36,33 @@ export interface AthleteMetadata {
   updatedAt: FirebaseFirestore.Timestamp;
 }
 
+export interface PhysicalAvg {
+  velocidad: number;
+  aceleracionCorta: number;
+  fuerzaDuelos: number;
+  resistencia: number;
+  potencia: number;
+  reaccion: number;
+  saquesLargos: number;
+  saquesCortos: number;
+}
+
+export interface TechnicalAvg {
+  pase: number;
+  control: number;
+  regate: number;
+  disparo: number;
+  cabecea: number;
+  presion: number;
+}
+
+export interface TacticalAvg {
+  posicionamiento: number;
+  marcaje: number;
+  desmarque: number;
+  transicion: number;
+}
+
 export interface AthleteDoc extends AthletePersonal, AthleteMetadata {
   id?: string;
   position?: string;
@@ -48,6 +75,10 @@ export interface AthleteDoc extends AthletePersonal, AthleteMetadata {
   clubHistory?: ClubHistoryEntry[];
   titles?: TitleEntry[];
   representative?: RepresentativeInfo;
+  physicalAvg?: PhysicalAvg;
+  technicalAvg?: TechnicalAvg;
+  tacticalAvg?: TacticalAvg;
+  evaluationCount?: number;
 }
 
 export interface CreateAthleteInput {

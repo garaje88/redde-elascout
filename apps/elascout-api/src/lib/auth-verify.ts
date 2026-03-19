@@ -41,7 +41,7 @@ async function getPublicKeys(): Promise<JwkKey[]> {
   return data.keys;
 }
 
-function base64urlDecode(str: string): Uint8Array {
+function base64urlDecode(str: string): Uint8Array<ArrayBuffer> {
   const padded = str.replace(/-/g, "+").replace(/_/g, "/");
   const padded2 = padded.padEnd(padded.length + ((4 - (padded.length % 4)) % 4), "=");
   const binary = atob(padded2);
