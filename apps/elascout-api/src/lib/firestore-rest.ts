@@ -285,6 +285,72 @@ export class FirestoreRest {
       });
   }
 
+  /**
+   * Run a collection group query (searches across all subcollections with the given name).
+   */
+  async collectionGroupQuery(
+    collectionId: string,
+    filters: Array<{ field: string; op: string; value: unknown }>,
+    orderBy: Array<{ field: string; direction: "ASCENDING" | "DESCENDING" }> = [],
+    limit?: number
+  ): Promise<Array<Record<string, unknown> & { id: string }>> {
+    const OP_MAP: Record<string, string> = {
+      "==": "EQUAL",
+      "!=": "NOT_EQUAL",
+      "<": "LESS_THAN",
+      "<=": "LESS_THAN_OR_EQUAL",
+      ">": "GREATER_THAN",
+      ">=": "GREATER_THAN_OR_EQUAL",
+      "array-contains": "ARRAY_CONTAINS",
+    };
+
+    const makeFilter = (f: { field: string; op: string; value: unknown }) => ({
+      fieldFilter: {
+        field: { fieldPath: f.field },
+        op: OP_MAP[f.op] ?? "EQUAL",
+        value: toFsValue(f.value),
+      },
+    });
+
+    const structuredQuery: Record<string, unknown> = {
+      from: [{ collectionId, allDescendants: true }],
+    };
+
+    if (filters.length === 1) {
+      structuredQuery.where = makeFilter(filters[0]!);
+    } else if (filters.length > 1) {
+      structuredQuery.where = {
+        compositeFilter: { op: "AND", filters: filters.map(makeFilter) },
+      };
+    }
+
+    if (orderBy.length > 0) {
+      structuredQuery.orderBy = orderBy.map((o) => ({
+        field: { fieldPath: o.field },
+        direction: o.direction,
+      }));
+    }
+
+    if (limit !== undefined) structuredQuery.limit = limit;
+
+    const res = await this.req(`${this.baseUrl}:runQuery`, {
+      method: "POST",
+      body: JSON.stringify({ structuredQuery }),
+    });
+
+    if (!res.ok) throw new Error(`Firestore collectionGroupQuery error ${res.status}: ${await res.text()}`);
+
+    const rows = (await res.json()) as Array<{ document?: FsDocument }>;
+    return rows
+      .filter((r) => r.document)
+      .map((r) => {
+        const doc = r.document!;
+        const nameParts = (doc.name ?? "").split("/");
+        const id = nameParts[nameParts.length - 1]!;
+        return { id, ...fromFsDoc(doc) };
+      });
+  }
+
   /** Generate a random Firestore-compatible document ID. */
   newId(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

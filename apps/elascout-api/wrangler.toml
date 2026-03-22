@@ -30,6 +30,11 @@ head_sampling_rate = 1
 
 [vars]
 CORS_ORIGIN = "https://elascout.garaje88.dev"
+# Anthropic
+ANTHROPIC_API_KEY="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"
+
+# resend
+RESEND_API_KEY="re_87J79uMx_NcJoZbobWUTAJutG9qo7ppds"
 
 # ─── Production environment ───────────────────────────────────────────────────
 [env.production]
@@ -42,6 +47,10 @@ CORS_ORIGIN = "https://elascout.garaje88.dev"
 #   wrangler secret put FIREBASE_CLIENT_EMAIL --env production
 #   wrangler secret put FIREBASE_PRIVATE_KEY --env production
 #   wrangler secret put GOOGLE_CLIENT_ID --env production
-#
+# Anthropic
+# ANTHROPIC_API_KEY=
+
+# resend
+# RESEND_API_KEY=re_87J79uMx_NcJoZbobWUTAJutG9qo7ppds
 # IMPORTANT: FIREBASE_PRIVATE_KEY must be entered with literal \n
 # (the wrangler CLI will preserve them — do NOT replace with actual newlines).

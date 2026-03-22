@@ -20840,7 +20840,8 @@
                       "fill": "$text-muted",
                       "content": "Deportistas",
                       "fontFamily": "$font-primary",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -20874,7 +20875,8 @@
                       "fill": "$text-muted",
                       "content": "Evaluaciones",
                       "fontFamily": "$font-primary",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -20908,7 +20910,8 @@
                       "fill": "$text-muted",
                       "content": "Organización",
                       "fontFamily": "$font-primary",
-                      "fontSize": 13
+                      "fontSize": 13,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -21026,7 +21029,8 @@
                       "fill": "#94A3B8",
                       "content": "Vista general de tu organización",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -21101,7 +21105,8 @@
                               "fill": "#94A3B8",
                               "content": "Total Deportistas",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "text",
@@ -21181,7 +21186,8 @@
                               "fill": "#94A3B8",
                               "content": "Evaluaciones Realizadas",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "text",
@@ -21261,7 +21267,8 @@
                               "fill": "#64748B",
                               "content": "/100",
                               "fontFamily": "Space Grotesk",
-                              "fontSize": 18
+                              "fontSize": 18,
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "text",
@@ -21270,7 +21277,8 @@
                               "fill": "#94A3B8",
                               "content": "Promedio General",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "text",
@@ -21350,7 +21358,8 @@
                               "fill": "#94A3B8",
                               "content": "Scouts Activos",
                               "fontFamily": "Inter",
-                              "fontSize": 13
+                              "fontSize": 13,
+                              "fontWeight": "normal"
                             },
                             {
                               "type": "text",
@@ -22970,6 +22979,1614 @@
                                   ]
                                 }
                               ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "5lH2A",
+      "x": 6160,
+      "y": -276,
+      "name": "Generar Reporte Page",
+      "clip": true,
+      "width": 1440,
+      "height": 900,
+      "fill": "$bg-primary",
+      "children": [
+        {
+          "type": "frame",
+          "id": "12Bp5",
+          "name": "Sidebar",
+          "width": 200,
+          "height": "fill_container",
+          "fill": "$sidebar-bg",
+          "layout": "vertical",
+          "padding": [
+            20,
+            12
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "87jKM",
+              "name": "logoArea",
+              "width": "fill_container",
+              "padding": [
+                12,
+                8
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "bqfi1",
+                  "name": "logoLeft",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "zHIzw",
+                      "name": "logoFrame",
+                      "clip": true,
+                      "width": 28,
+                      "height": 28,
+                      "fill": "$accent-green",
+                      "cornerRadius": "$radius-sm"
+                    },
+                    {
+                      "type": "text",
+                      "id": "SfwvB",
+                      "name": "logoText",
+                      "fill": "$text-primary",
+                      "content": "Ela Scout",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon_font",
+                  "id": "jaL9C",
+                  "name": "collapseIcon",
+                  "width": 18,
+                  "height": 18,
+                  "iconFontName": "panel-left-close",
+                  "iconFontFamily": "lucide",
+                  "fill": "$text-muted"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Qo0j7",
+              "name": "spacer",
+              "width": "fill_container",
+              "height": 16
+            },
+            {
+              "type": "frame",
+              "id": "ITHgk",
+              "name": "navGroup",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "f4vaU",
+                  "name": "nav1",
+                  "width": "fill_container",
+                  "cornerRadius": "$radius-sm",
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "0fuF0",
+                      "name": "icon1",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "layout-dashboard",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "VD1uP",
+                      "name": "label1",
+                      "fill": "$text-secondary",
+                      "content": "Dashboard",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Qtg4c",
+                  "name": "nav2",
+                  "width": "fill_container",
+                  "cornerRadius": "$radius-sm",
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "TUw2C",
+                      "name": "icon2",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "users",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "j0Xrr",
+                      "name": "label2",
+                      "fill": "$text-secondary",
+                      "content": "Deportistas",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Pxozt",
+                  "name": "nav3",
+                  "width": "fill_container",
+                  "cornerRadius": "$radius-sm",
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "snL1R",
+                      "name": "icon3",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "clipboard-list",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "J2jjy",
+                      "name": "label3",
+                      "fill": "$text-secondary",
+                      "content": "Evaluaciones",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "QxtTp",
+                  "name": "nav4",
+                  "width": "fill_container",
+                  "cornerRadius": "$radius-sm",
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "e5T7e",
+                      "name": "icon4",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "building-2",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "vAqAw",
+                      "name": "label4",
+                      "fill": "$text-secondary",
+                      "content": "Organizaciones",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "szVKj",
+                  "name": "nav5",
+                  "width": "fill_container",
+                  "fill": "$sidebar-active",
+                  "cornerRadius": "$radius-sm",
+                  "gap": 10,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "RCW39",
+                      "name": "icon5",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "file-text",
+                      "iconFontFamily": "lucide",
+                      "fill": "$accent-green"
+                    },
+                    {
+                      "type": "text",
+                      "id": "UhHdc",
+                      "name": "label5",
+                      "fill": "$text-primary",
+                      "content": "Reportes",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "AcEki",
+          "name": "MainContent",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "$bg-primary",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "QVNww",
+              "name": "TopBar",
+              "width": "fill_container",
+              "height": 56,
+              "stroke": {
+                "align": "inside",
+                "thickness": {
+                  "bottom": 1
+                },
+                "fill": "$border-primary"
+              },
+              "padding": [
+                0,
+                24
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "LcKJc",
+                  "name": "tbTitle",
+                  "fill": "$text-primary",
+                  "content": "Reportes",
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "78eXG",
+                  "name": "tbRight",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "LOAjm",
+                      "name": "tbBell",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "bell",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-muted"
+                    },
+                    {
+                      "type": "ellipse",
+                      "id": "LDkMd",
+                      "name": "tbAvatar",
+                      "fill": "$border-primary",
+                      "width": 32,
+                      "height": 32
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "QjAqz",
+              "name": "HeaderSection",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "padding": [
+                24,
+                32
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "KhKqP",
+                  "name": "hsTitle",
+                  "fill": "$text-primary",
+                  "content": "Generar Reporte",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "TQFYH",
+                  "name": "hsSub",
+                  "fill": "$text-secondary",
+                  "content": "Configura y genera informes detallados de tus deportistas",
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ZH5nn",
+              "name": "BodyArea",
+              "width": 1241,
+              "height": "fill_container",
+              "gap": 24,
+              "padding": [
+                0,
+                32,
+                24,
+                32
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "4Rlne",
+                  "name": "LeftPanel",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "fill": "$bg-secondary",
+                  "cornerRadius": "$radius-lg",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 0,
+                    "fill": "#00000000"
+                  },
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 20,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Gv9Wo",
+                      "name": "PanelHeader",
+                      "width": "fill_container",
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Kttm4",
+                          "name": "pt",
+                          "fill": "$text-primary",
+                          "content": "Seleccionar Deportistas",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "s3s6g",
+                          "name": "Badge",
+                          "fill": "$sidebar-active",
+                          "cornerRadius": 12,
+                          "padding": [
+                            4,
+                            10
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "wsoYt",
+                              "name": "bt",
+                              "fill": "$accent-green",
+                              "content": "3 seleccionados",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "93vPk",
+                      "name": "SearchBar",
+                      "width": "fill_container",
+                      "height": 40,
+                      "fill": "$bg-input",
+                      "cornerRadius": "$radius-md",
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "$border-primary"
+                      },
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        12
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "67gXM",
+                          "name": "si",
+                          "width": 16,
+                          "height": 16,
+                          "iconFontName": "search",
+                          "iconFontFamily": "lucide",
+                          "fill": "$text-muted"
+                        },
+                        {
+                          "type": "text",
+                          "id": "jdI2T",
+                          "name": "st",
+                          "fill": "$text-muted",
+                          "content": "Buscar deportista por nombre...",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "hKVw1",
+                      "name": "AthleteList",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "H6dZn",
+                          "name": "Row1",
+                          "width": "fill_container",
+                          "fill": "$bg-card",
+                          "cornerRadius": "$radius-md",
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "$accent-green"
+                          },
+                          "gap": 12,
+                          "padding": 12,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "8eBSP",
+                              "name": "x1",
+                              "width": 18,
+                              "height": 18,
+                              "fill": "$accent-green",
+                              "cornerRadius": 4,
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "UIYEq",
+                                  "x": 3,
+                                  "y": 3,
+                                  "name": "k1",
+                                  "width": 12,
+                                  "height": 12,
+                                  "iconFontName": "check",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#FFFFFF"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "zaTCw",
+                              "name": "d1",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "8nCLO",
+                                  "name": "t1",
+                                  "fill": "$text-primary",
+                                  "content": "Carlos Martínez",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "067hx",
+                                  "name": "s1",
+                                  "fill": "$text-secondary",
+                                  "content": "Delantero · Club Atlético Nacional",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "0shry",
+                          "name": "Row2",
+                          "width": "fill_container",
+                          "fill": "$bg-card",
+                          "cornerRadius": "$radius-md",
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "$accent-green"
+                          },
+                          "gap": 12,
+                          "padding": 12,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "mhoHt",
+                              "name": "x2",
+                              "width": 18,
+                              "height": 18,
+                              "fill": "$accent-green",
+                              "cornerRadius": 4,
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "NU2ei",
+                                  "x": 3,
+                                  "y": 3,
+                                  "name": "k2",
+                                  "width": 12,
+                                  "height": 12,
+                                  "iconFontName": "check",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#FFFFFF"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "MRfEL",
+                              "name": "d2",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "l4R3A",
+                                  "name": "t2",
+                                  "fill": "$text-primary",
+                                  "content": "Andrés Rodríguez",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "os8gy",
+                                  "name": "s2",
+                                  "fill": "$text-secondary",
+                                  "content": "Mediocampista · Deportivo Cali",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "zaYGl",
+                          "name": "Row3",
+                          "width": "fill_container",
+                          "fill": "$bg-card",
+                          "cornerRadius": "$radius-md",
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "$accent-green"
+                          },
+                          "gap": 12,
+                          "padding": 12,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "ng9ih",
+                              "name": "x3",
+                              "width": 18,
+                              "height": 18,
+                              "fill": "$accent-green",
+                              "cornerRadius": 4,
+                              "layout": "none",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "IUAfv",
+                                  "x": 3,
+                                  "y": 3,
+                                  "name": "k3",
+                                  "width": 12,
+                                  "height": 12,
+                                  "iconFontName": "check",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#FFFFFF"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "DYza2",
+                              "name": "d3",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Yo6Bm",
+                                  "name": "t3",
+                                  "fill": "$text-primary",
+                                  "content": "Luis Hernández",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "SOsiE",
+                                  "name": "s3",
+                                  "fill": "$text-secondary",
+                                  "content": "Defensa · Millonarios FC",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "hBMzy",
+                          "name": "Row4",
+                          "width": "fill_container",
+                          "fill": "$bg-card",
+                          "cornerRadius": "$radius-md",
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "$border-primary"
+                          },
+                          "gap": 12,
+                          "padding": 12,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "NOvym",
+                              "name": "cb4",
+                              "width": 18,
+                              "height": 18,
+                              "cornerRadius": 4,
+                              "stroke": {
+                                "align": "inside",
+                                "thickness": 1,
+                                "fill": "$border-primary"
+                              }
+                            },
+                            {
+                              "type": "frame",
+                              "id": "2ZGpI",
+                              "name": "d4",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "HiJBN",
+                                  "name": "t4",
+                                  "fill": "$text-primary",
+                                  "content": "Santiago López",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "95LUE",
+                                  "name": "s4",
+                                  "fill": "$text-secondary",
+                                  "content": "Portero · Independiente Medellín",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "AHxjK",
+                          "name": "Row5",
+                          "width": "fill_container",
+                          "fill": "$bg-card",
+                          "cornerRadius": "$radius-md",
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "$border-primary"
+                          },
+                          "gap": 12,
+                          "padding": 12,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "WwO2e",
+                              "name": "cb5",
+                              "width": 18,
+                              "height": 18,
+                              "cornerRadius": 4,
+                              "stroke": {
+                                "align": "inside",
+                                "thickness": 1,
+                                "fill": "$border-primary"
+                              }
+                            },
+                            {
+                              "type": "frame",
+                              "id": "rYOlB",
+                              "name": "d5",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "gcG4b",
+                                  "name": "t5",
+                                  "fill": "$text-primary",
+                                  "content": "Miguel Torres",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "AIPp4",
+                                  "name": "s5",
+                                  "fill": "$text-secondary",
+                                  "content": "Mediocampista · América de Cali",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Etajp",
+                          "name": "Row6",
+                          "width": "fill_container",
+                          "fill": "$bg-card",
+                          "cornerRadius": "$radius-md",
+                          "stroke": {
+                            "align": "inside",
+                            "thickness": 1,
+                            "fill": "$border-primary"
+                          },
+                          "gap": 12,
+                          "padding": 12,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Oj2Dn",
+                              "name": "cb6",
+                              "width": 18,
+                              "height": 18,
+                              "cornerRadius": 4,
+                              "stroke": {
+                                "align": "inside",
+                                "thickness": 1,
+                                "fill": "$border-primary"
+                              }
+                            },
+                            {
+                              "type": "frame",
+                              "id": "4TbKq",
+                              "name": "d6",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "lMG0T",
+                                  "name": "t6",
+                                  "fill": "$text-primary",
+                                  "content": "Diego Morales",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "VXCJW",
+                                  "name": "s6",
+                                  "fill": "$text-secondary",
+                                  "content": "Delantero · Atlético Junior",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "2dg72",
+                      "name": "PanelFooter",
+                      "width": "fill_container",
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": {
+                          "top": 1
+                        },
+                        "fill": "$border-primary"
+                      },
+                      "padding": [
+                        12,
+                        0,
+                        0,
+                        0
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "qBV1I",
+                          "name": "fc",
+                          "fill": "$text-secondary",
+                          "content": "3 deportistas seleccionados",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "pZuRR",
+                          "name": "fa",
+                          "fill": "$accent-green",
+                          "content": "Seleccionar todos",
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "jwB98",
+                  "name": "RightPanelSpace",
+                  "width": 420,
+                  "height": "fill_container",
+                  "fill": "$bg-primary",
+                  "stroke": {
+                    "thickness": 0
+                  },
+                  "layout": "vertical",
+                  "gap": 20,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "sYK20",
+                      "name": "ot",
+                      "fill": "$text-primary",
+                      "content": "Opciones del Reporte",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Kyy2n",
+                      "name": "Options Card",
+                      "clip": true,
+                      "width": "fill_container",
+                      "fill": "$bg-secondary",
+                      "cornerRadius": "$radius-lg",
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$border-primary"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Nlxi6",
+                          "name": "Opt Graficos",
+                          "width": "fill_container",
+                          "stroke": {
+                            "thickness": {
+                              "bottom": 1
+                            },
+                            "fill": "$border-subtle"
+                          },
+                          "padding": [
+                            14,
+                            16
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "nkibD",
+                              "name": "o1l",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "KVE8b",
+                                  "name": "o1t",
+                                  "fill": "$text-primary",
+                                  "content": "Incluir gráficos",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "HefzZ",
+                                  "name": "o1d",
+                                  "fill": "$text-muted",
+                                  "content": "Radar charts y gráficos de evolución",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "bgM0o",
+                              "name": "toggle-on",
+                              "width": 40,
+                              "height": 22,
+                              "fill": "$accent-green",
+                              "cornerRadius": 11,
+                              "padding": 2,
+                              "justifyContent": "end",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "jnC3N",
+                                  "name": "te1",
+                                  "fill": "#FFFFFF",
+                                  "width": 18,
+                                  "height": 18
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "qwyAu",
+                          "name": "Opt Evaluacion",
+                          "width": "fill_container",
+                          "stroke": {
+                            "thickness": {
+                              "bottom": 1
+                            },
+                            "fill": "$border-subtle"
+                          },
+                          "layout": "vertical",
+                          "gap": 10,
+                          "padding": [
+                            14,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "9aiLn",
+                              "name": "o2h",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "JZhNO",
+                                  "name": "o2t",
+                                  "fill": "$text-primary",
+                                  "content": "Tipo de evaluación",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "yNJ0Q",
+                                  "name": "o2d",
+                                  "fill": "$text-muted",
+                                  "content": "Detalle individual o resumen consolidado",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "4EBFI",
+                              "name": "Segment Control",
+                              "width": "fill_container",
+                              "height": 36,
+                              "fill": "$bg-input",
+                              "cornerRadius": "$radius-md",
+                              "padding": 3,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "GlIRn",
+                                  "name": "sa",
+                                  "width": "fill_container",
+                                  "height": "fill_container",
+                                  "fill": "$accent-green",
+                                  "cornerRadius": "$radius-sm",
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "GPF8e",
+                                      "name": "sat",
+                                      "fill": "#FFFFFF",
+                                      "content": "Por evaluación",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "rALLQ",
+                                  "name": "sb",
+                                  "width": "fill_container",
+                                  "height": "fill_container",
+                                  "cornerRadius": "$radius-sm",
+                                  "justifyContent": "center",
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "wEFKI",
+                                      "name": "sbt",
+                                      "fill": "$text-secondary",
+                                      "content": "Consolidado",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "500"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "hbU6q",
+                          "name": "Opt Datos Personales",
+                          "width": "fill_container",
+                          "stroke": {
+                            "thickness": {
+                              "bottom": 1
+                            },
+                            "fill": "$border-subtle"
+                          },
+                          "padding": [
+                            14,
+                            16
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "eNkiQ",
+                              "name": "o3l",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "1Ux6k",
+                                  "name": "o3t",
+                                  "fill": "$text-primary",
+                                  "content": "Datos personales",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "9SZhQ",
+                                  "name": "o3d",
+                                  "fill": "$text-muted",
+                                  "content": "Nombre, edad, nacionalidad, contacto",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "zcQ3u",
+                              "name": "toggle-on",
+                              "width": 40,
+                              "height": 22,
+                              "fill": "$accent-green",
+                              "cornerRadius": 11,
+                              "padding": 2,
+                              "justifyContent": "end",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "qTeRK",
+                                  "name": "te3",
+                                  "fill": "#FFFFFF",
+                                  "width": 18,
+                                  "height": 18
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "cjag5",
+                          "name": "Opt Representante",
+                          "width": "fill_container",
+                          "stroke": {
+                            "thickness": {
+                              "bottom": 1
+                            },
+                            "fill": "$border-subtle"
+                          },
+                          "padding": [
+                            14,
+                            16
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "cmr1P",
+                              "name": "o4l",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "e1TwD",
+                                  "name": "o4t",
+                                  "fill": "$text-primary",
+                                  "content": "Datos del representante",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "clatL",
+                                  "name": "o4d",
+                                  "fill": "$text-muted",
+                                  "content": "Nombre, contacto y relación contractual",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "i1ZCC",
+                              "name": "toggle-off",
+                              "width": 40,
+                              "height": 22,
+                              "fill": "$border-primary",
+                              "cornerRadius": 11,
+                              "padding": 2,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "y4DQU",
+                                  "name": "te4",
+                                  "fill": "$text-muted",
+                                  "width": 18,
+                                  "height": 18
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "VSzTS",
+                          "name": "Opt Historial",
+                          "width": "fill_container",
+                          "stroke": {
+                            "thickness": {
+                              "bottom": 1
+                            },
+                            "fill": "$border-subtle"
+                          },
+                          "padding": [
+                            14,
+                            16
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "AknpS",
+                              "name": "o5l",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "LjTPC",
+                                  "name": "o5t",
+                                  "fill": "$text-primary",
+                                  "content": "Historial de clubes",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "AFEyG",
+                                  "name": "o5d",
+                                  "fill": "$text-muted",
+                                  "content": "Timeline de clubes anteriores",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "fAyj5",
+                              "name": "toggle-on",
+                              "width": 40,
+                              "height": 22,
+                              "fill": "$accent-green",
+                              "cornerRadius": 11,
+                              "padding": 2,
+                              "justifyContent": "end",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "LE7RM",
+                                  "name": "te5",
+                                  "fill": "#FFFFFF",
+                                  "width": 18,
+                                  "height": 18
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Qj2G9",
+                          "name": "Opt Premios",
+                          "width": "fill_container",
+                          "padding": [
+                            14,
+                            16
+                          ],
+                          "justifyContent": "space_between",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Y9vzM",
+                              "name": "o6l",
+                              "layout": "vertical",
+                              "gap": 2,
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "fxSdm",
+                                  "name": "o6t",
+                                  "fill": "$text-primary",
+                                  "content": "Premios y reconocimientos",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "500"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "YTrR8",
+                                  "name": "o6d",
+                                  "fill": "$text-muted",
+                                  "content": "Títulos, logros y distinciones",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "fvjU7",
+                              "name": "toggle-off",
+                              "width": 40,
+                              "height": 22,
+                              "fill": "$border-primary",
+                              "cornerRadius": 11,
+                              "padding": 2,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "OBoL8",
+                                  "name": "te6",
+                                  "fill": "$text-muted",
+                                  "width": 18,
+                                  "height": 18
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "H28ol",
+                      "name": "Summary Card",
+                      "width": "fill_container",
+                      "fill": "$bg-secondary",
+                      "cornerRadius": "$radius-lg",
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$border-primary"
+                      },
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "YBKbW",
+                          "name": "smt",
+                          "fill": "$text-muted",
+                          "content": "RESUMEN DEL REPORTE",
+                          "fontFamily": "Inter",
+                          "fontSize": 11,
+                          "fontWeight": "600",
+                          "letterSpacing": 1
+                        },
+                        {
+                          "type": "frame",
+                          "id": "owVjY",
+                          "name": "sr1",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "MLkCf",
+                              "name": "si1",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "users",
+                              "iconFontFamily": "lucide",
+                              "fill": "$accent-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "UlHVb",
+                              "name": "st1",
+                              "fill": "$text-primary",
+                              "content": "3 deportistas seleccionados",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "CKAr7",
+                          "name": "sr2",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "fycQY",
+                              "name": "si2",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "chart-line",
+                              "iconFontFamily": "lucide",
+                              "fill": "$accent-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "dEF4y",
+                              "name": "st2",
+                              "fill": "$text-primary",
+                              "content": "Con gráficos · Por evaluación",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "VGe8M",
+                          "name": "sr3",
+                          "width": "fill_container",
+                          "gap": 6,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "T5UWl",
+                              "name": "si3",
+                              "width": 14,
+                              "height": 14,
+                              "iconFontName": "list-checks",
+                              "iconFontFamily": "lucide",
+                              "fill": "$accent-green"
+                            },
+                            {
+                              "type": "text",
+                              "id": "bRwaK",
+                              "name": "st3",
+                              "fill": "$text-primary",
+                              "content": "Datos personales · Historial de clubes",
+                              "fontFamily": "Inter",
+                              "fontSize": 13,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "5foxi",
+                      "name": "Buttons",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zJSwv",
+                          "name": "Generate Btn",
+                          "width": "fill_container",
+                          "height": 44,
+                          "fill": "$accent-green",
+                          "cornerRadius": "$radius-md",
+                          "gap": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "ydKxQ",
+                              "name": "bgi",
+                              "width": 16,
+                              "height": 16,
+                              "iconFontName": "download",
+                              "iconFontFamily": "lucide",
+                              "fill": "#FFFFFF"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Q0vcS",
+                              "name": "bgt",
+                              "fill": "#FFFFFF",
+                              "content": "Generar Reporte",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
                             }
                           ]
                         }

@@ -19,8 +19,8 @@ interface PlayerOnField {
   position: string;
   team: "home" | "away";
   isSubstitute: boolean;
-  fieldX: number; // 0–1 normalized
-  fieldY: number; // 0–1 normalized
+  fieldX: number;
+  fieldY: number;
 }
 
 interface TeamConfig {
@@ -55,7 +55,7 @@ function TrashIcon() {
   );
 }
 
-// ─── Soccer Field SVG with Pointer-based drag ────────────────────────────────
+// ─── Soccer Field SVG with Pointer-based drag (touch + mouse) ─────────────
 
 function SoccerFieldSVG({
   players,
@@ -77,7 +77,7 @@ function SoccerFieldSVG({
   const svgRef = useRef<SVGSVGElement>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const didDrag = useRef(false);
 
   // Convert client coordinates to normalized 0–1
@@ -90,7 +90,7 @@ function SoccerFieldSVG({
     };
   }, []);
 
-  // Pointer handlers for moving players already on field
+  // Pointer handlers for moving players already on field (works for touch + mouse)
   const handlePointerDown = useCallback((e: React.PointerEvent, playerId: string) => {
     if (readOnly) return;
     e.preventDefault();
@@ -115,12 +115,15 @@ function SoccerFieldSVG({
     e.preventDefault();
     if (didDrag.current) {
       onPlayerMove(draggingId, dragPos.x, dragPos.y);
+    } else {
+      // Tap without drag = toggle selection (for touch devices)
+      setSelectedId((prev) => prev === draggingId ? null : draggingId);
     }
     setDraggingId(null);
     setDragPos(null);
   }, [draggingId, dragPos, onPlayerMove]);
 
-  // HTML5 drag for sidebar → field drops
+  // HTML5 drag for sidebar → field drops (desktop only)
   function handleDragOver(e: React.DragEvent<SVGSVGElement>) {
     if (readOnly) return;
     e.preventDefault();
@@ -150,6 +153,7 @@ function SoccerFieldSVG({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
+        onClick={() => setSelectedId(null)}
       >
         {/* Field background stripes */}
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -185,7 +189,7 @@ function SoccerFieldSVG({
         {/* Players on field */}
         {fieldPlayers.map((p) => {
           const isDragging = draggingId === p.athleteId;
-          const isHovered = hoveredId === p.athleteId && !draggingId;
+          const isSelected = selectedId === p.athleteId;
           const px = isDragging && dragPos ? dragPos.x * 700 : p.fieldX * 700;
           const py = isDragging && dragPos ? dragPos.y * 1000 : p.fieldY * 1000;
           const color = mode === "individual" ? "#3B82F6" : p.team === "home" ? "#3B82F6" : "#EF4444";
@@ -194,23 +198,24 @@ function SoccerFieldSVG({
               key={p.athleteId}
               transform={`translate(${px}, ${py})`}
               opacity={isDragging ? 0.7 : 1}
-              onMouseEnter={() => { if (!draggingId) setHoveredId(p.athleteId); }}
-              onMouseLeave={() => setHoveredId(null)}
             >
+              {/* Touch target — larger invisible circle for easier tapping */}
+              <circle r="40" fill="transparent" style={{ cursor: readOnly ? "default" : "grab" }}
+                onPointerDown={(e) => handlePointerDown(e, p.athleteId)}
+              />
               {/* Shadow */}
               <ellipse cx="0" cy="35" rx="22" ry="6" fill="black" opacity="0.25" />
-              {/* Hover highlight ring */}
-              {isHovered && (
+              {/* Selected highlight ring */}
+              {isSelected && (
                 <circle r="34" fill="none" stroke="white" strokeWidth="2" opacity="0.4" />
               )}
               {/* Player circle */}
               <circle
                 r="28"
                 fill={color}
-                stroke={isHovered ? "#00E59B" : "white"}
-                strokeWidth={isHovered ? "3" : "2.5"}
-                style={{ cursor: readOnly ? "default" : isDragging ? "grabbing" : "grab" }}
-                onPointerDown={(e) => handlePointerDown(e, p.athleteId)}
+                stroke={isSelected ? "#00E59B" : "white"}
+                strokeWidth={isSelected ? "3" : "2.5"}
+                style={{ cursor: readOnly ? "default" : isDragging ? "grabbing" : "grab", pointerEvents: "none" }}
               />
               {/* Initials */}
               <text textAnchor="middle" dy="5" fontSize="14" fontWeight="bold" fill="white" style={{ pointerEvents: "none" }}>
@@ -222,17 +227,17 @@ function SoccerFieldSVG({
                 {p.name.split(" ")[0]}
               </text>
 
-              {/* Action buttons on hover */}
-              {isHovered && (
+              {/* Action buttons — shown on selection (works on touch tap + mouse hover) */}
+              {isSelected && (
                 <>
                   {/* Remove from field (X) — top-right (only when editable) */}
                   {!readOnly && (
                     <g
                       transform="translate(32, -32)"
                       style={{ cursor: "pointer" }}
-                      onClick={(e) => { e.stopPropagation(); onRemoveFromField(p.athleteId); setHoveredId(null); }}
+                      onClick={(e) => { e.stopPropagation(); onRemoveFromField(p.athleteId); setSelectedId(null); }}
                     >
-                      <circle r="15" fill="#EF4444" stroke="white" strokeWidth="2" />
+                      <circle r="18" fill="#EF4444" stroke="white" strokeWidth="2" />
                       <line x1="-5" y1="-5" x2="5" y2="5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
                       <line x1="5" y1="-5" x2="-5" y2="5" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
                     </g>
@@ -244,7 +249,7 @@ function SoccerFieldSVG({
                     style={{ cursor: "pointer" }}
                     onClick={(e) => { e.stopPropagation(); onEvalPlayer(p.athleteId); }}
                   >
-                    <circle r="15" fill="#00E59B" stroke="white" strokeWidth="2" />
+                    <circle r="18" fill="#00E59B" stroke="white" strokeWidth="2" />
                     <g transform="translate(-6, -7) scale(0.55)">
                       <path d="M9 2a1 1 0 00-1 1H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2h-2a1 1 0 00-1-1H9z" fill="none" stroke="#0B0E14" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                       <path d="M9 5h6M9 9h6M9 13h4" stroke="#0B0E14" strokeWidth="2" strokeLinecap="round" />
@@ -264,8 +269,8 @@ function SoccerFieldSVG({
             <svg className="h-8 w-8 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
             </svg>
-            <p className="text-sm font-medium text-muted">Arrastra jugadores al campo</p>
-            <p className="text-xs text-muted/70">Desde los paneles laterales</p>
+            <p className="text-sm font-medium text-muted">Toca un jugador del panel y luego el campo</p>
+            <p className="text-xs text-muted/70">O arrastra desde el panel lateral</p>
           </div>
         </div>
       )}
@@ -273,7 +278,7 @@ function SoccerFieldSVG({
   );
 }
 
-// ─── Player Row ───────────────────────────────────────────────────────────────
+// ─── Player Row (touch-friendly: always visible actions) ──────────────────
 
 function PlayerRow({
   player,
@@ -281,6 +286,7 @@ function PlayerRow({
   onEval,
   onRemove,
   onToggleSub,
+  onPlaceOnField,
   isSubstitute,
   isOnField,
   readOnly,
@@ -290,37 +296,49 @@ function PlayerRow({
   onEval: () => void;
   onRemove: () => void;
   onToggleSub: () => void;
+  onPlaceOnField?: () => void;
   isSubstitute: boolean;
   isOnField: boolean;
   readOnly?: boolean;
 }) {
   return (
     <div
-      className={`group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 transition-colors hover:border-dark-50 hover:bg-dark-100/60 ${readOnly ? "cursor-default" : "cursor-grab active:cursor-grabbing"}`}
-      draggable={!readOnly}
-      onDragStart={(e) => { if (readOnly) { e.preventDefault(); return; } e.dataTransfer.setData("athleteId", player.athleteId); }}
+      className="group flex items-center gap-2 rounded-lg border border-transparent px-2 py-2 transition-colors hover:border-dark-50 hover:bg-dark-100/60"
     >
       <div
-        className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
+        className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
         style={{ backgroundColor: color }}
       >
         {player.initials}
         {isOnField && (
-          <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-brand-500 ring-2 ring-dark-50" />
+          <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-dark-50" />
         )}
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-xs font-medium text-surface">{player.name}</p>
         <p className="truncate text-[10px] text-muted">{player.position || "Sin posicion"}</p>
       </div>
-      <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+      {/* Actions — always visible for touch, opacity on desktop hover */}
+      <div className="flex shrink-0 items-center gap-1">
+        {/* Place on field button (touch alternative to drag) */}
+        {!readOnly && !isSubstitute && !isOnField && onPlaceOnField && (
+          <button
+            onClick={onPlaceOnField}
+            title="Colocar en campo"
+            className="rounded p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500 active:bg-brand-500/20"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
+        )}
         <button
           onClick={onEval}
-          title={readOnly ? "Ver evaluación" : "Evaluar"}
-          className="rounded p-1 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500"
+          title={readOnly ? "Ver evaluacion" : "Evaluar"}
+          className="rounded p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500 active:bg-brand-500/20"
         >
           {readOnly ? (
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -333,16 +351,16 @@ function PlayerRow({
             <button
               onClick={onToggleSub}
               title={isSubstitute ? "Mover a titulares" : "Mover a suplentes"}
-              className="rounded p-1 text-muted transition-colors hover:bg-dark-50 hover:text-amber-400"
+              className="rounded p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-amber-400 active:bg-amber-400/20"
             >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
               </svg>
             </button>
             <button
               onClick={onRemove}
               title="Eliminar"
-              className="rounded p-1 text-muted transition-colors hover:bg-dark-50 hover:text-red-400"
+              className="rounded p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-red-400 active:bg-red-400/20"
             >
               <TrashIcon />
             </button>
@@ -353,7 +371,7 @@ function PlayerRow({
   );
 }
 
-// ─── Athlete Search ───────────────────────────────────────────────────────────
+// ─── Athlete Search ───────────────────────────────────────────────────────
 
 function AthleteSearch({
   token,
@@ -388,13 +406,17 @@ function AthleteSearch({
   }, [q, token]);
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
 
   return (
@@ -408,7 +430,7 @@ function AthleteSearch({
           placeholder={placeholder ?? "Agregar deportista..."}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          className="w-full rounded-lg border border-dark-50 bg-dark-100 pl-8 pr-3 py-2 text-xs text-surface placeholder:text-muted focus:border-brand-500 focus:outline-none"
+          className="w-full rounded-lg border border-dark-50 bg-dark-100 pl-8 pr-3 py-2.5 text-sm text-surface placeholder:text-muted focus:border-brand-500 focus:outline-none"
         />
       </div>
       {open && results.length > 0 && (
@@ -417,7 +439,7 @@ function AthleteSearch({
             <button
               key={a.id}
               onClick={() => { onAdd(a, team); setQ(""); setOpen(false); }}
-              className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-dark-100"
+              className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-dark-100 active:bg-dark-100"
             >
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-semibold text-brand-500">
                 {a.firstName[0]}{a.lastName[0]}
@@ -434,7 +456,7 @@ function AthleteSearch({
   );
 }
 
-// ─── Timer ───────────────────────────────────────────────────────────────────
+// ─── Timer ───────────────────────────────────────────────────────────────
 
 function GameTimer({ startedAt }: { startedAt: string }) {
   const [elapsed, setElapsed] = useState(0);
@@ -454,14 +476,14 @@ function GameTimer({ startedAt }: { startedAt: string }) {
   const urgent = remaining < 15 * 60;
 
   return (
-    <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-mono font-semibold tabular-nums ${urgent ? "bg-amber-500/20 text-amber-400" : "bg-dark-100 text-surface"}`}>
+    <div className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-mono font-semibold tabular-nums sm:px-3 sm:py-1.5 sm:text-sm ${urgent ? "bg-amber-500/20 text-amber-400" : "bg-dark-100 text-surface"}`}>
       {urgent && <span className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />}
       {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
     </div>
   );
 }
 
-// ─── Team Panel ───────────────────────────────────────────────────────────────
+// ─── Team Panel (responsive: collapsible on tablet) ──────────────────────
 
 function TeamPanel({
   team,
@@ -475,6 +497,7 @@ function TeamPanel({
   onAdd,
   onRemove,
   onToggleSub,
+  onPlaceOnField,
 }: {
   team: "home" | "away";
   config: TeamConfig;
@@ -487,6 +510,7 @@ function TeamPanel({
   onAdd: (athlete: Athlete, team: "home" | "away") => void;
   onRemove: (athleteId: string) => void;
   onToggleSub: (athleteId: string) => void;
+  onPlaceOnField: (athleteId: string) => void;
 }) {
   const router = useRouter();
   const titulares = players.filter((p) => !p.isSubstitute);
@@ -494,7 +518,7 @@ function TeamPanel({
   const dotColor = team === "home" ? "bg-blue-500" : "bg-red-500";
 
   return (
-    <div className="flex w-56 shrink-0 flex-col gap-2 rounded-xl border border-dark-50 bg-dark-50 p-3">
+    <div className="flex w-full flex-col gap-2 rounded-xl border border-dark-50 bg-dark-50 p-3 md:w-56 md:shrink-0">
       {/* Team header */}
       <div className="flex items-center gap-2">
         <div className={`h-3 w-3 rounded-full shrink-0 ${dotColor}`} />
@@ -518,7 +542,7 @@ function TeamPanel({
       </select>
 
       {/* Players list — scrollable */}
-      <div className="flex-1 overflow-y-auto space-y-3 min-h-0 pr-0.5">
+      <div className="max-h-[200px] overflow-y-auto space-y-3 md:flex-1 md:max-h-none md:min-h-0 pr-0.5">
         <div>
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted">
             Titulares ({titulares.length})
@@ -532,6 +556,7 @@ function TeamPanel({
                 isSubstitute={false}
                 isOnField={p.fieldX > 0 && p.fieldY > 0}
                 readOnly={readOnly}
+                onPlaceOnField={() => onPlaceOnField(p.athleteId)}
                 onEval={() => router.push(`/evaluations/${evaluationId}/athletes/${p.athleteId}`)}
                 onRemove={() => onRemove(p.athleteId)}
                 onToggleSub={() => onToggleSub(p.athleteId)}
@@ -578,7 +603,7 @@ function TeamPanel({
   );
 }
 
-// ─── Individual Panel ─────────────────────────────────────────────────────────
+// ─── Individual Panel ─────────────────────────────────────────────────────
 
 function IndividualPanel({
   players,
@@ -587,6 +612,7 @@ function IndividualPanel({
   readOnly,
   onAdd,
   onRemove,
+  onPlaceOnField,
 }: {
   players: PlayerOnField[];
   token: string;
@@ -594,41 +620,52 @@ function IndividualPanel({
   readOnly?: boolean;
   onAdd: (athlete: Athlete, team: "home" | "away") => void;
   onRemove: (athleteId: string) => void;
+  onPlaceOnField: (athleteId: string) => void;
 }) {
   const router = useRouter();
   return (
-    <div className="flex w-64 shrink-0 flex-col gap-3 rounded-xl border border-dark-50 bg-dark-50 p-3">
+    <div className="flex w-full flex-col gap-3 rounded-xl border border-dark-50 bg-dark-50 p-3 md:w-64 md:shrink-0">
       <div>
         <p className="text-sm font-semibold text-surface">Deportistas</p>
-        <p className="text-[11px] text-muted">Arrastra al campo para posicionar</p>
+        <p className="text-[11px] text-muted">Toca + para colocar en el campo</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-0.5 min-h-0">
+      <div className="max-h-[200px] overflow-y-auto space-y-0.5 md:flex-1 md:max-h-none md:min-h-0">
         {players.map((p) => (
           <div
             key={p.athleteId}
-            className={`group flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 transition-colors hover:border-dark-50 hover:bg-dark-100/60 ${readOnly ? "cursor-default" : "cursor-grab active:cursor-grabbing"}`}
-            draggable={!readOnly}
-            onDragStart={(e) => { if (readOnly) { e.preventDefault(); return; } e.dataTransfer.setData("athleteId", p.athleteId); }}
+            className="group flex items-center gap-2 rounded-lg border border-transparent px-2 py-2 transition-colors hover:border-dark-50 hover:bg-dark-100/60"
           >
-            <div className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[11px] font-bold text-white">
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[11px] font-bold text-white">
               {p.initials}
               {p.fieldX > 0 && p.fieldY > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-brand-500 ring-2 ring-dark-50" />
+                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-dark-50" />
               )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium text-surface">{p.name}</p>
               <p className="truncate text-[10px] text-muted">{p.position || "Sin posicion"}</p>
             </div>
-            <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex shrink-0 items-center gap-1">
+              {/* Place on field — touch friendly */}
+              {!readOnly && !(p.fieldX > 0 && p.fieldY > 0) && (
+                <button
+                  onClick={() => onPlaceOnField(p.athleteId)}
+                  title="Colocar en campo"
+                  className="rounded p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500 active:bg-brand-500/20"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </button>
+              )}
               <button
                 onClick={() => router.push(`/evaluations/${evaluationId}/athletes/${p.athleteId}`)}
-                title={readOnly ? "Ver evaluación" : "Evaluar"}
-                className="rounded p-1 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500"
+                title={readOnly ? "Ver evaluacion" : "Evaluar"}
+                className="rounded p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500 active:bg-brand-500/20"
               >
                 {readOnly ? (
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -640,7 +677,7 @@ function IndividualPanel({
                 <button
                   onClick={() => onRemove(p.athleteId)}
                   title="Eliminar"
-                  className="rounded p-1 text-muted transition-colors hover:bg-dark-50 hover:text-red-400"
+                  className="rounded p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-red-400 active:bg-red-400/20"
                 >
                   <TrashIcon />
                 </button>
@@ -669,7 +706,7 @@ function IndividualPanel({
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Main Component ───────────────────────────────────────────────────────
 
 export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
   const router = useRouter();
@@ -682,6 +719,7 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [token, setToken] = useState("");
+  const [panelOpen, setPanelOpen] = useState(true);
 
   const [homeTeam, setHomeTeam] = useState<TeamConfig>({ name: "Local", formation: "4-4-2", color: "#3B82F6" });
   const [awayTeam, setAwayTeam] = useState<TeamConfig>({ name: "Visitante", formation: "4-3-3", color: "#EF4444" });
@@ -760,6 +798,23 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
     });
   }, []);
 
+  // Place player on field at auto-calculated position (touch alternative to drag)
+  const placeOnField = useCallback((athleteId: string) => {
+    setPlayers((prev) => {
+      const onField = prev.filter((p) => p.fieldX > 0 && p.fieldY > 0);
+      // Place in a grid pattern, avoiding overlap
+      const col = onField.length % 4;
+      const row = Math.floor(onField.length / 4);
+      const x = 0.2 + col * 0.2;
+      const y = 0.2 + row * 0.15;
+      return prev.map((p) =>
+        p.athleteId === athleteId
+          ? { ...p, fieldX: Math.min(x, 0.9), fieldY: Math.min(y, 0.85), isSubstitute: false }
+          : p
+      );
+    });
+  }, []);
+
   function dropOnField(x: number, y: number, athleteId: string) {
     setPlayers((prev) =>
       prev.map((p) => p.athleteId === athleteId ? { ...p, fieldX: x, fieldY: y, isSubstitute: false } : p)
@@ -824,6 +879,8 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
     }
   }, [token, evaluationId]);
 
+  const isReadOnly = evalStatus === "completed" || evalStatus === "expired";
+
   // Auto-save with 1.5s debounce after any change (disabled in readOnly)
   useEffect(() => {
     if (!isInitialized.current || !token || isReadOnly) return;
@@ -832,7 +889,7 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
       saveFormation(players, homeTeam, awayTeam);
     }, 1500);
     return () => clearTimeout(autoSaveTimer.current);
-  }, [players, homeTeam, awayTeam, token, saveFormation]);
+  }, [players, homeTeam, awayTeam, token, saveFormation, isReadOnly]);
 
   async function finishEvaluation() {
     if (!token) return;
@@ -846,54 +903,62 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
     router.push("/evaluations");
   }
 
-  const isReadOnly = evalStatus === "completed" || evalStatus === "expired";
-
   const homePlayers = players.filter((p) => p.team === "home");
   const awayPlayers = players.filter((p) => p.team === "away");
 
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col gap-0">
-      {/* Top bar */}
-      <div className="mb-4 flex items-center justify-between gap-4 border-b border-dark-50 pb-4">
-        <div className="flex min-w-0 items-center gap-3">
+      {/* Top bar — responsive */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-dark-50 pb-3 md:mb-4 md:gap-4 md:pb-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <Link href="/evaluations" className="shrink-0 rounded-lg p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-surface">
             <BackIcon />
           </Link>
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-surface">{evalTitle}</p>
+            <p className="truncate text-xs font-semibold text-surface sm:text-sm">{evalTitle}</p>
             {isReadOnly && (
               <p className="text-[10px] text-muted">Solo lectura ({evalStatus === "completed" ? "completada" : "expirada"})</p>
             )}
           </div>
           {!isReadOnly && <GameTimer startedAt={startedAt} />}
           {isReadOnly && (
-            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${evalStatus === "completed" ? "bg-dark-100 text-muted" : "bg-red-500/20 text-red-400"}`}>
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:py-1 sm:text-xs ${evalStatus === "completed" ? "bg-dark-100 text-muted" : "bg-red-500/20 text-red-400"}`}>
               {evalStatus === "completed" ? "Completada" : "Expirada"}
             </span>
           )}
         </div>
 
-        {/* Mode toggle */}
-        <div className="flex items-center rounded-lg border border-dark-50 bg-dark-100 p-0.5">
-          <button
-            onClick={() => setMode("match")}
-            className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${mode === "match" ? "bg-dark-50 text-surface shadow-sm" : "text-muted hover:text-surface"}`}
-          >
-            Partido
-          </button>
-          <button
-            onClick={() => setMode("individual")}
-            className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${mode === "individual" ? "bg-dark-50 text-surface shadow-sm" : "text-muted hover:text-surface"}`}
-          >
-            Individual
-          </button>
-        </div>
+        <div className="flex items-center gap-2">
+          {/* Mode toggle */}
+          <div className="flex items-center rounded-lg border border-dark-50 bg-dark-100 p-0.5">
+            <button
+              onClick={() => setMode("match")}
+              className={`rounded-md px-2 py-1 text-[11px] font-semibold transition-colors sm:px-3 sm:py-1.5 sm:text-xs ${mode === "match" ? "bg-dark-50 text-surface shadow-sm" : "text-muted hover:text-surface"}`}
+            >
+              Partido
+            </button>
+            <button
+              onClick={() => setMode("individual")}
+              className={`rounded-md px-2 py-1 text-[11px] font-semibold transition-colors sm:px-3 sm:py-1.5 sm:text-xs ${mode === "individual" ? "bg-dark-50 text-surface shadow-sm" : "text-muted hover:text-surface"}`}
+            >
+              Individual
+            </button>
+          </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+          {/* Toggle panel visibility on tablet */}
+          <button
+            onClick={() => setPanelOpen((o) => !o)}
+            className="rounded-lg border border-dark-50 bg-dark-100 p-1.5 text-muted transition-colors hover:text-surface md:hidden"
+            title={panelOpen ? "Ocultar paneles" : "Mostrar paneles"}
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+          </button>
+
           {!isReadOnly && (
             <>
-              {/* Auto-save status */}
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="hidden items-center gap-1.5 text-xs sm:flex">
                 {saving ? (
                   <>
                     <div className="h-3 w-3 animate-spin rounded-full border-2 border-muted border-t-brand-500" />
@@ -907,12 +972,12 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
                     <span className="text-brand-500 font-medium">Guardado</span>
                   </>
                 ) : (
-                  <span className="text-muted/60 text-[11px]">Auto-guardado activo</span>
+                  <span className="text-muted/60 text-[11px]">Auto-guardado</span>
                 )}
               </div>
               <button
                 onClick={finishEvaluation}
-                className="rounded-lg bg-brand-500 px-3 py-2 text-sm font-semibold text-dark transition-opacity hover:opacity-90"
+                className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-dark transition-opacity hover:opacity-90 sm:px-3 sm:py-2 sm:text-sm"
               >
                 Finalizar
               </button>
@@ -921,27 +986,32 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
         </div>
       </div>
 
-      {/* 3-column layout */}
-      <div className="flex flex-1 gap-3 min-h-0">
+      {/* Main layout — vertical on mobile/tablet, horizontal on desktop */}
+      <div className="flex flex-1 flex-col gap-3 min-h-0 md:flex-row">
         {mode === "match" ? (
           <>
-            {/* Home team */}
-            <TeamPanel
-              team="home"
-              config={homeTeam}
-              players={homePlayers}
-              token={token}
-              evaluationId={evaluationId}
-              readOnly={isReadOnly}
-              onNameChange={(name) => setHomeTeam((t) => ({ ...t, name }))}
-              onFormationChange={(formation) => setHomeTeam((t) => ({ ...t, formation }))}
-              onAdd={addPlayer}
-              onRemove={removePlayer}
-              onToggleSub={toggleSubstitute}
-            />
+            {/* Panels — shown below field on mobile, side on desktop */}
+            {panelOpen && (
+              <div className="order-2 flex gap-3 overflow-x-auto pb-2 md:order-none md:flex-col md:overflow-x-visible md:pb-0">
+                <TeamPanel
+                  team="home"
+                  config={homeTeam}
+                  players={homePlayers}
+                  token={token}
+                  evaluationId={evaluationId}
+                  readOnly={isReadOnly}
+                  onNameChange={(name) => setHomeTeam((t) => ({ ...t, name }))}
+                  onFormationChange={(formation) => setHomeTeam((t) => ({ ...t, formation }))}
+                  onAdd={addPlayer}
+                  onRemove={removePlayer}
+                  onToggleSub={toggleSubstitute}
+                  onPlaceOnField={placeOnField}
+                />
+              </div>
+            )}
 
             {/* Field */}
-            <div className="flex flex-1 flex-col rounded-xl overflow-hidden border border-dark-50">
+            <div className="order-1 flex flex-1 flex-col rounded-xl overflow-hidden border border-dark-50 min-h-[300px] md:order-none md:min-h-0">
               <SoccerFieldSVG
                 players={players}
                 mode={mode}
@@ -953,35 +1023,45 @@ export function GameFieldClient({ evaluationId }: { evaluationId: string }) {
               />
             </div>
 
-            {/* Away team */}
-            <TeamPanel
-              team="away"
-              config={awayTeam}
-              players={awayPlayers}
-              token={token}
-              evaluationId={evaluationId}
-              readOnly={isReadOnly}
-              onNameChange={(name) => setAwayTeam((t) => ({ ...t, name }))}
-              onFormationChange={(formation) => setAwayTeam((t) => ({ ...t, formation }))}
-              onAdd={addPlayer}
-              onRemove={removePlayer}
-              onToggleSub={toggleSubstitute}
-            />
+            {/* Away team — separate panel on desktop, inline on mobile */}
+            {panelOpen && (
+              <div className="order-3 flex gap-3 overflow-x-auto pb-2 md:order-none md:flex-col md:overflow-x-visible md:pb-0">
+                <TeamPanel
+                  team="away"
+                  config={awayTeam}
+                  players={awayPlayers}
+                  token={token}
+                  evaluationId={evaluationId}
+                  readOnly={isReadOnly}
+                  onNameChange={(name) => setAwayTeam((t) => ({ ...t, name }))}
+                  onFormationChange={(formation) => setAwayTeam((t) => ({ ...t, formation }))}
+                  onAdd={addPlayer}
+                  onRemove={removePlayer}
+                  onToggleSub={toggleSubstitute}
+                  onPlaceOnField={placeOnField}
+                />
+              </div>
+            )}
           </>
         ) : (
           <>
             {/* Individual panel */}
-            <IndividualPanel
-              players={players}
-              token={token}
-              evaluationId={evaluationId}
-              readOnly={isReadOnly}
-              onAdd={addPlayer}
-              onRemove={removePlayer}
-            />
+            {panelOpen && (
+              <div className="order-2 md:order-none">
+                <IndividualPanel
+                  players={players}
+                  token={token}
+                  evaluationId={evaluationId}
+                  readOnly={isReadOnly}
+                  onAdd={addPlayer}
+                  onRemove={removePlayer}
+                  onPlaceOnField={placeOnField}
+                />
+              </div>
+            )}
 
             {/* Field */}
-            <div className="flex flex-1 flex-col rounded-xl overflow-hidden border border-dark-50">
+            <div className="order-1 flex flex-1 flex-col rounded-xl overflow-hidden border border-dark-50 min-h-[300px] md:order-none md:min-h-0">
               <SoccerFieldSVG
                 players={players}
                 mode={mode}

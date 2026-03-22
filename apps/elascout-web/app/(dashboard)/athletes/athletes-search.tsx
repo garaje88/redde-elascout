@@ -201,7 +201,7 @@ export function AthletesSearch() {
       {/* ── Filter Bar ── */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Search */}
-        <div className="relative min-w-[260px] flex-1">
+        <div className="relative w-full flex-1 sm:min-w-[200px]">
           <svg
             className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
@@ -257,13 +257,13 @@ export function AthletesSearch() {
         </div>
 
         {/* Club / Organización */}
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <input
             type="text"
             value={filters.club}
             onChange={handleTextChange("club", clubDebounceRef)}
             placeholder="Organización"
-            className="h-10 w-40 rounded-lg border border-dark-50 bg-dark-50 px-3 text-sm text-surface placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="h-10 w-full rounded-lg border border-dark-50 bg-dark-50 px-3 text-sm text-surface placeholder:text-muted transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 sm:w-40"
           />
         </div>
 
@@ -290,15 +290,16 @@ export function AthletesSearch() {
 
       {/* ── Table ── */}
       <div className="overflow-hidden rounded-xl border border-dark-50 bg-dark-50">
+        <div className="overflow-x-auto">
         {/* Table Header */}
-        <div className="flex items-center bg-dark-100 px-5 py-0" style={{ height: 48 }}>
-          <div className="w-12 shrink-0" />
+        <div className="flex min-w-[640px] items-center bg-dark-100 px-4 py-0 sm:px-5" style={{ height: 48 }}>
+          <div className="w-10 shrink-0 sm:w-12" />
           <div className="flex-1 min-w-0 text-xs font-semibold uppercase tracking-wide text-muted">Nombre</div>
-          <div className="w-36 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted">Nacionalidad</div>
-          <div className="w-32 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted">Posición</div>
-          <div className="w-20 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted">Edad</div>
-          <div className="w-40 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted">Organización</div>
-          <div className="w-20 shrink-0 text-center text-xs font-semibold uppercase tracking-wide text-muted">Acciones</div>
+          <div className="hidden w-32 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted md:block lg:w-36">Nacionalidad</div>
+          <div className="w-28 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted sm:w-32">Posición</div>
+          <div className="w-16 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted sm:w-20">Edad</div>
+          <div className="hidden w-36 shrink-0 text-xs font-semibold uppercase tracking-wide text-muted lg:block xl:w-40">Organización</div>
+          <div className="w-16 shrink-0 text-center text-xs font-semibold uppercase tracking-wide text-muted sm:w-20">Acciones</div>
         </div>
 
         {/* Loading state */}
@@ -363,19 +364,19 @@ export function AthletesSearch() {
               return (
                 <div
                   key={athlete.id}
-                  className={`group flex items-center px-5 transition-colors hover:bg-dark-100/50 ${!isLast ? "border-b border-dark-100" : ""}`}
+                  className={`group flex min-w-[640px] items-center px-4 transition-colors hover:bg-dark-100/50 active:bg-dark-100/50 sm:px-5 ${!isLast ? "border-b border-dark-100" : ""}`}
                   style={{ height: 56 }}
                 >
                   {/* Avatar */}
-                  <div className="w-12 shrink-0">
+                  <div className="w-10 shrink-0 sm:w-12">
                     {athlete.photoURL ? (
                       <img
                         src={athlete.photoURL}
                         alt={`${athlete.firstName} ${athlete.lastName}`}
-                        className="h-9 w-9 rounded-full object-cover ring-2 ring-dark-100"
+                        className="h-8 w-8 rounded-full object-cover ring-2 ring-dark-100 sm:h-9 sm:w-9"
                       />
                     ) : (
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br ${gradient} text-xs font-bold text-dark`}>
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br ${gradient} text-xs font-bold text-dark sm:h-9 sm:w-9`}>
                         {initials}
                       </div>
                     )}
@@ -391,15 +392,15 @@ export function AthletesSearch() {
                     )}
                   </div>
 
-                  {/* Nacionalidad */}
-                  <div className="w-36 shrink-0">
+                  {/* Nacionalidad — hidden on small screens */}
+                  <div className="hidden w-32 shrink-0 md:block lg:w-36">
                     <span className="text-sm text-muted-light">{athlete.nationality || "—"}</span>
                   </div>
 
                   {/* Posición */}
-                  <div className="w-32 shrink-0">
+                  <div className="w-28 shrink-0 sm:w-32">
                     {athlete.position ? (
-                      <span className="inline-block rounded-full bg-brand-500/10 px-2.5 py-0.5 text-xs font-medium text-brand-500">
+                      <span className="inline-block rounded-full bg-brand-500/10 px-2 py-0.5 text-[11px] font-medium text-brand-500 sm:px-2.5 sm:text-xs">
                         {athlete.position}
                       </span>
                     ) : (
@@ -408,33 +409,33 @@ export function AthletesSearch() {
                   </div>
 
                   {/* Edad */}
-                  <div className="w-20 shrink-0">
+                  <div className="w-16 shrink-0 sm:w-20">
                     <span className="text-sm text-muted-light">{age !== null ? age : "—"}</span>
                   </div>
 
-                  {/* Organización */}
-                  <div className="w-40 shrink-0">
+                  {/* Organización — hidden on small screens */}
+                  <div className="hidden w-36 shrink-0 lg:block xl:w-40">
                     <span className="truncate text-sm text-muted-light">{athlete.currentClub || "—"}</span>
                   </div>
 
-                  {/* Acciones */}
-                  <div className="w-20 shrink-0 flex items-center justify-center gap-3">
+                  {/* Acciones — touch-friendly size */}
+                  <div className="w-16 shrink-0 flex items-center justify-center gap-2 sm:w-20 sm:gap-3">
                     <Link
                       href={`/athletes/${athlete.id}`}
-                      className="text-muted transition-colors hover:text-brand-500"
+                      className="rounded-md p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500 active:bg-brand-500/20"
                       title="Ver perfil"
                     >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="h-4 w-4 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </Link>
                     <Link
                       href={`/athletes/${athlete.id}/edit`}
-                      className="text-muted transition-colors hover:text-brand-500"
+                      className="rounded-md p-1.5 text-muted transition-colors hover:bg-dark-50 hover:text-brand-500 active:bg-brand-500/20"
                       title="Editar"
                     >
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="h-4 w-4 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
                       </svg>
                     </Link>
@@ -445,34 +446,36 @@ export function AthletesSearch() {
           </div>
         )}
 
+        </div>{/* close overflow-x-auto */}
+
         {/* ── Pagination ── */}
         {!isLoading && athletes.length > 0 && (
-          <div className="flex items-center justify-between border-t border-dark-100 bg-dark-100 px-5 py-3">
+          <div className="flex flex-col items-center justify-between gap-2 border-t border-dark-100 bg-dark-100 px-4 py-3 sm:flex-row sm:px-5">
             <p className="text-xs text-muted">
-              Mostrando {Math.min((safePage - 1) * PAGE_SIZE + 1, athletes.length)}–{Math.min(safePage * PAGE_SIZE, athletes.length)} de {athletes.length} deportista{athletes.length !== 1 ? "s" : ""}
+              Mostrando {Math.min((safePage - 1) * PAGE_SIZE + 1, athletes.length)}–{Math.min(safePage * PAGE_SIZE, athletes.length)} de {athletes.length}
             </p>
 
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={safePage === 1}
-                className="flex items-center gap-1 rounded-md border border-dark-50 px-3 py-1.5 text-xs text-muted-light transition-colors hover:border-brand-500/40 hover:text-surface disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-md border border-dark-50 px-2 py-1.5 text-xs text-muted-light transition-colors hover:border-brand-500/40 hover:text-surface active:bg-dark-50 disabled:cursor-not-allowed disabled:opacity-40 sm:px-3"
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
-                Anterior
+                <span className="hidden sm:inline">Anterior</span>
               </button>
 
               {getPageNumbers().map((p, i) =>
                 p === "..." ? (
-                  <span key={`dots-${i}`} className="px-2 text-xs text-muted">...</span>
+                  <span key={`dots-${i}`} className="px-1 text-xs text-muted sm:px-2">...</span>
                 ) : (
                   <button
                     key={p}
                     onClick={() => setPage(p as number)}
-                    className={`min-w-[30px] rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
+                    className={`min-w-[36px] rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
                       safePage === p
                         ? "bg-brand-500 text-dark"
-                        : "text-muted-light hover:bg-dark-50 hover:text-surface"
+                        : "text-muted-light hover:bg-dark-50 hover:text-surface active:bg-dark-50"
                     }`}
                   >
                     {p}
@@ -483,9 +486,9 @@ export function AthletesSearch() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safePage === totalPages}
-                className="flex items-center gap-1 rounded-md border border-dark-50 px-3 py-1.5 text-xs text-muted-light transition-colors hover:border-brand-500/40 hover:text-surface disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex items-center gap-1 rounded-md border border-dark-50 px-2 py-1.5 text-xs text-muted-light transition-colors hover:border-brand-500/40 hover:text-surface active:bg-dark-50 disabled:cursor-not-allowed disabled:opacity-40 sm:px-3"
               >
-                Siguiente
+                <span className="hidden sm:inline">Siguiente</span>
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
