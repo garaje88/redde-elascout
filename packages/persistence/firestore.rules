@@ -3,7 +3,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helpers
+    // ============================================
+    // HELPERS
+    // ============================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -20,47 +23,370 @@ service cloud.firestore {
       return exists(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid));
     }
 
-    function hasOrgRole(orgId, roles) {
-      let member = get(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid)).data;
-      return member.role in roles;
+    function getMemberRole(orgId) {
+      return get(/databases/$(database)/documents/organizations/$(orgId)/members/$(request.auth.uid)).data.role;
     }
 
-    // Users
+    function hasOrgRole(orgId, roles) {
+      return getMemberRole(orgId) in roles;
+    }
+
+    function isAdmin(orgId) {
+      return hasOrgRole(orgId, ['admin']);
+    }
+
+    function isCoachOrHigher(orgId) {
+      return hasOrgRole(orgId, ['admin', 'coach']);
+    }
+
+    function isScoutOrHigher(orgId) {
+      return hasOrgRole(orgId, ['admin', 'coach', 'scout']);
+    }
+
+    function isViewerOrHigher(orgId) {
+      return hasOrgRole(orgId, ['admin', 'coach', 'scout', 'viewer']);
+    }
+
+    // Validaciones de campos
+    function isValidEmail(email) {
+      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    function isValidUrl(url) {
+      return url.matches('^(https?://)[^\\s]+$') || url == '';
+    }
+
+    function isValidPosition(position) {
+      let validPositions = [
+        'portero', 'defensa-central', 'lateral-derecho', 'lateral-izquierdo',
+        'centrocampista-defensivo', 'centrocampista-central', 
+        'centrocampista-ofensivo', 'extremo-derecho', 'extremo-izquierdo',
+        'delantero-centro', 'segundo-delantero'
+      ];
+      return position in validPositions;
+    }
+
+    function isValidPreferredFoot(foot) {
+      return foot in ['left', 'right', 'both'];
+    }
+
+    function isValidMode(mode) {
+      return mode in ['individual', 'organization'];
+    }
+
+    function isValidOrgRole(role) {
+      return role in ['admin', 'coach', 'scout', 'viewer'];
+    }
+
+    function isValidEvaluationType(type) {
+      return type in ['physical', 'technical', 'tactical'];
+    }
+
+    function isValidScore(score) {
+      return score >= 0 && score <= 100;
+    }
+
+    function isValidInviteCode(code) {
+      return code.size() == 6 && code.matches('^[A-Z0-9]{6}$');
+    }
+
+    // ============================================
+    // USERS /users/{uid}
+    // ============================================
     match /users/{uid} {
       allow read: if isAuthenticated() && isOwner(uid);
-      allow create: if isAuthenticated() && isOwner(uid);
-      allow update: if isAuthenticated() && isOwner(uid);
+
+      allow create: if isAuthenticated() 
+        && isOwner(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 0
+        && isValidEmail(request.resource.data.email)
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() > 0
+        && request.resource.data.displayName.size() <= 100
+        && request.resource.data.mode is string
+        && isValidMode(request.resource.data.mode)
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+
+      allow update: if isAuthenticated() 
+        && isOwner(uid)
+        && (
+          // No cambiar uid
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid'])
+          // Validar campos si están presentes
+          && (request.resource.data.displayName == null 
+              || (request.resource.data.displayName is string 
+                  && request.resource.data.displayName.size() > 0 
+                  && request.resource.data.displayName.size() <= 100))
+          && (request.resource.data.photoURL == null 
+              || isValidUrl(request.resource.data.photoURL))
+          && (request.resource.data.mode == null 
+              || isValidMode(request.resource.data.mode))
+          && (request.resource.data.organizationId == null 
+              || request.resource.data.organizationId is string)
+          && (request.resource.data.role == null 
+              || isValidOrgRole(request.resource.data.role))
+        );
+
+      allow delete: if isAuthenticated() && isOwner(uid);
     }
 
-    // Athletes
+    // ============================================
+    // ATHLETES /athletes/{athleteId}
+    // ============================================
     match /athletes/{athleteId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated() && (
-        resource.data.createdBy == request.auth.uid ||
-        hasOrgRole(resource.data.organizationId, ['admin', 'coach', 'scout'])
+
+      allow create: if isAuthenticated()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.firstName is string
+        && request.resource.data.firstName.size() > 0
+        && request.resource.data.firstName.size() <= 50
+        && request.resource.data.lastName is string
+        && request.resource.data.lastName.size() > 0
+        && request.resource.data.lastName.size() <= 50
+        && request.resource.data.dateOfBirth is timestamp
+        && request.resource.data.nationality is string
+        && request.resource.data.nationality.size() > 0
+        && request.resource.data.nationality.size() <= 50
+        && request.resource.data.position is string
+        && request.resource.data.position.size() > 0
+        && request.resource.data.preferredFoot is string
+        && isValidPreferredFoot(request.resource.data.preferredFoot)
+        && request.resource.data.height is number
+        && request.resource.data.height > 0
+        && request.resource.data.height < 300
+        && request.resource.data.weight is number
+        && request.resource.data.weight > 0
+        && request.resource.data.weight < 500
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
+        // Campos opcionales con validación
+        && (request.resource.data.contactEmail == null 
+            || (request.resource.data.contactEmail is string 
+                && (request.resource.data.contactEmail == '' 
+                    || isValidEmail(request.resource.data.contactEmail))))
+        && (request.resource.data.contactPhone == null 
+            || request.resource.data.contactPhone is string)
+        && (request.resource.data.photoURL == null 
+            || isValidUrl(request.resource.data.photoURL))
+        && (request.resource.data.secondaryPosition == null 
+            || request.resource.data.secondaryPosition is string)
+        && (request.resource.data.currentClub == null 
+            || request.resource.data.currentClub is string)
+        && (request.resource.data.contractEnd == null 
+            || request.resource.data.contractEnd is timestamp)
+        && (request.resource.data.clubHistory == null 
+            || (
+              request.resource.data.clubHistory is list
+              && request.resource.data.clubHistory.size() <= 20
+            ))
+        && (request.resource.data.titles == null 
+            || (
+              request.resource.data.titles is list
+              && request.resource.data.titles.size() <= 30
+            ))
+        // Validación de capacidades físicas
+        && (request.resource.data.physical == null 
+            || (
+              request.resource.data.physical is map
+              && (request.resource.data.physical.speed == null 
+                  || isValidScore(request.resource.data.physical.speed))
+              && (request.resource.data.physical.acceleration == null 
+                  || isValidScore(request.resource.data.physical.acceleration))
+              && (request.resource.data.physical.strength == null 
+                  || isValidScore(request.resource.data.physical.strength))
+              && (request.resource.data.physical.endurance == null 
+                  || isValidScore(request.resource.data.physical.endurance))
+              && (request.resource.data.physical.power == null 
+                  || isValidScore(request.resource.data.physical.power))
+              && (request.resource.data.physical.reaction == null 
+                  || isValidScore(request.resource.data.physical.reaction))
+              && (request.resource.data.physical.longThrow == null 
+                  || isValidScore(request.resource.data.physical.longThrow))
+              && (request.resource.data.physical.shortThrow == null 
+                  || isValidScore(request.resource.data.physical.shortThrow))
+            ));
+
+      allow update: if isAuthenticated() && (
+        // Owner puede actualizar
+        resource.data.createdBy == request.auth.uid
+        // O miembros de la org con rol suficiente
+        || (resource.data.organizationId != null 
+            && isScoutOrHigher(resource.data.organizationId))
+      ) && (
+        // Validaciones de actualización
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['id', 'createdBy', 'createdAt'])
+        && (request.resource.data.firstName == null 
+            || (request.resource.data.firstName is string 
+                && request.resource.data.firstName.size() > 0 
+                && request.resource.data.firstName.size() <= 50))
+        && (request.resource.data.lastName == null 
+            || (request.resource.data.lastName is string 
+                && request.resource.data.lastName.size() > 0 
+                && request.resource.data.lastName.size() <= 50))
+        && (request.resource.data.height == null 
+            || (request.resource.data.height is number 
+                && request.resource.data.height > 0 
+                && request.resource.data.height < 300))
+        && (request.resource.data.weight == null 
+            || (request.resource.data.weight is number 
+                && request.resource.data.weight > 0 
+                && request.resource.data.weight < 500))
+        // Solo admins pueden cambiar organizationId
+        && (request.resource.data.organizationId == null 
+            || resource.data.organizationId == request.resource.data.organizationId
+            || (resource.data.organizationId != null 
+                && isAdmin(resource.data.organizationId)))
       );
 
-      // Evaluations subcollection
+      allow delete: if isAuthenticated() && (
+        resource.data.createdBy == request.auth.uid
+        || (resource.data.organizationId != null 
+            && isAdmin(resource.data.organizationId))
+      );
+
+      // ============================================
+      // EVALUATIONS /athletes/{athleteId}/evaluations/{evalId}
+      // ============================================
       match /evaluations/{evalId} {
         allow read: if isAuthenticated();
-        allow create: if isAuthenticated();
-        allow update, delete: if isAuthenticated() && (
-          resource.data.evaluatorId == request.auth.uid ||
-          hasOrgRole(get(/databases/$(database)/documents/athletes/$(athleteId)).data.organizationId, ['admin'])
+
+        allow create: if isAuthenticated()
+          && request.resource.data.evaluatorId == request.auth.uid
+          && request.resource.data.type is string
+          && isValidEvaluationType(request.resource.data.type)
+          && request.resource.data.scores is map
+          && request.resource.data.scores.size() > 0
+          && request.resource.data.scores.size() <= 20
+          && request.resource.data.overallScore is number
+          && request.resource.data.overallScore >= 0
+          && request.resource.data.overallScore <= 100
+          && request.resource.data.evaluatorId is string
+          && request.resource.data.evaluatorName is string
+          && request.resource.data.evaluatorName.size() > 0
+          && request.resource.data.evaluatorName.size() <= 100
+          && request.resource.data.date is timestamp
+          && request.resource.data.createdAt is timestamp
+          // Validar que todos los scores estén en rango 0-100
+          && request.resource.data.scores.values().hasOnly([request.resource.data.scores.values()])
+          && request.resource.data.scores.values().size() > 0
+          // Notas opcionales
+          && (request.resource.data.notes == null 
+              || (request.resource.data.notes is string 
+                  && request.resource.data.notes.size() <= 5000));
+
+        allow update: if isAuthenticated() && (
+          // Evaluador original puede actualizar
+          resource.data.evaluatorId == request.auth.uid
+          // O admins de la organización
+          || (resource.data.evaluatorId != null 
+              && get(/databases/$(database)/documents/athletes/$(athleteId)).data.organizationId != null
+              && isAdmin(get(/databases/$(database)/documents/athletes/$(athleteId)).data.organizationId))
+        ) && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['id', 'evaluatorId', 'createdAt'])
+          && (request.resource.data.type == null 
+              || isValidEvaluationType(request.resource.data.type))
+          && (request.resource.data.scores == null 
+              || (
+                request.resource.data.scores is map
+                && request.resource.data.scores.size() > 0
+                && request.resource.data.scores.size() <= 20
+              ))
+          && (request.resource.data.overallScore == null 
+              || (
+                request.resource.data.overallScore is number
+                && request.resource.data.overallScore >= 0
+                && request.resource.data.overallScore <= 100
+              ))
+          && (request.resource.data.notes == null 
+              || (request.resource.data.notes is string 
+                  && request.resource.data.notes.size() <= 5000))
+        );
+
+        allow delete: if isAuthenticated() && (
+          resource.data.evaluatorId == request.auth.uid
+          || (resource.data.evaluatorId != null 
+              && get(/databases/$(database)/documents/athletes/$(athleteId)).data.organizationId != null
+              && isAdmin(get(/databases/$(database)/documents/athletes/$(athleteId)).data.organizationId))
         );
       }
     }
 
-    // Organizations
+    // ============================================
+    // ORGANIZATIONS /organizations/{orgId}
+    // ============================================
     match /organizations/{orgId} {
       allow read: if isAuthenticated() && isMemberOfOrg(orgId);
-      allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated() && hasOrgRole(orgId, ['admin']);
 
+      allow create: if isAuthenticated()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.inviteCode is string
+        && isValidInviteCode(request.resource.data.inviteCode)
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
+        && (request.resource.data.logoURL == null 
+            || isValidUrl(request.resource.data.logoURL));
+
+      allow update: if isAuthenticated() && isAdmin(orgId) && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['id', 'createdBy', 'createdAt', 'inviteCode'])
+        && (request.resource.data.name == null 
+            || (request.resource.data.name is string 
+                && request.resource.data.name.size() > 0 
+                && request.resource.data.name.size() <= 100))
+        && (request.resource.data.logoURL == null 
+            || isValidUrl(request.resource.data.logoURL))
+      );
+
+      allow delete: if isAuthenticated() && isAdmin(orgId);
+
+      // ============================================
+      // MEMBERS /organizations/{orgId}/members/{memberId}
+      // ============================================
       match /members/{memberId} {
         allow read: if isAuthenticated() && isMemberOfOrg(orgId);
-        allow write: if isAuthenticated() && hasOrgRole(orgId, ['admin']);
+
+        allow create: if isAuthenticated() && isAdmin(orgId)
+          && request.resource.data.uid == memberId
+          && request.resource.data.uid is string
+          && request.resource.data.displayName is string
+          && request.resource.data.displayName.size() > 0
+          && request.resource.data.displayName.size() <= 100
+          && request.resource.data.email is string
+          && request.resource.data.email.size() > 0
+          && isValidEmail(request.resource.data.email)
+          && request.resource.data.role is string
+          && isValidOrgRole(request.resource.data.role)
+          && request.resource.data.joinedAt is timestamp;
+
+        allow update: if isAuthenticated() && (
+          // Admin puede cambiar roles de otros
+          isAdmin(orgId)
+          // Miembro puede actualizar su propio nombre y foto
+          || (isMemberOfOrg(orgId) && memberId == request.auth.uid)
+        ) && (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'email', 'joinedAt'])
+          && (request.resource.data.displayName == null 
+              || (request.resource.data.displayName is string 
+                  && request.resource.data.displayName.size() > 0 
+                  && request.resource.data.displayName.size() <= 100))
+          && (request.resource.data.role == null 
+              || (
+                isAdmin(orgId) && isValidOrgRole(request.resource.data.role)
+              ))
+        );
+
+        allow delete: if isAuthenticated() && (
+          // Admin puede eliminar miembros
+          (isAdmin(orgId) && memberId != request.auth.uid)
+          // Miembro puede eliminarse a sí mismo (abandonar org)
+          || (memberId == request.auth.uid && isMemberOfOrg(orgId))
+        );
       }
     }
   }
