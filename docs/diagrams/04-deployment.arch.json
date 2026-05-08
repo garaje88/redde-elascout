@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "title": "ElaScout — Despliegue",
+  "type": "engineering-diagram",
+  "source": "generated",
+  "profile": "engineering-review",
+  "theme": "tech-blue",
+  "layout": "horizontal",
+  "counts": {
+    "nodes": 9,
+    "edges": 9,
+    "modules": 4
+  },
+  "nodes": [
+    {
+      "id": "vercel",
+      "label": "Vercel\n(elascout-web)",
+      "type": "service",
+      "module": "edge"
+    },
+    {
+      "id": "cfpages",
+      "label": "Cloudflare Pages\n(alternativa)",
+      "type": "service",
+      "module": "edge"
+    },
+    {
+      "id": "gcr",
+      "label": "Google Container\nRegistry",
+      "type": "database",
+      "module": "gcp"
+    },
+    {
+      "id": "cloudrun",
+      "label": "Cloud Run\nelascout-api\n(Docker, autoscale 0..N)",
+      "type": "service",
+      "module": "gcp"
+    },
+    {
+      "id": "fbauth",
+      "label": "Firebase Auth",
+      "type": "service",
+      "module": "firebase"
+    },
+    {
+      "id": "firestore",
+      "label": "Firestore\nrules + indexes",
+      "type": "database",
+      "module": "firebase"
+    },
+    {
+      "id": "storage",
+      "label": "Firebase Storage\n(fotos atletas)",
+      "type": "database",
+      "module": "firebase"
+    },
+    {
+      "id": "anthropic",
+      "label": "Anthropic\nClaude API",
+      "type": "service",
+      "module": "external"
+    },
+    {
+      "id": "resend",
+      "label": "Resend\n(SMTP)",
+      "type": "service",
+      "module": "external"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "from": "vercel",
+      "to": "cloudrun",
+      "type": "primary",
+      "label": "HTTPS"
+    },
+    {
+      "id": "edge-2",
+      "from": "cfpages",
+      "to": "cloudrun",
+      "type": "optional",
+      "label": "HTTPS"
+    },
+    {
+      "id": "edge-3",
+      "from": "vercel",
+      "to": "fbauth",
+      "type": "data"
+    },
+    {
+      "id": "edge-4",
+      "from": "vercel",
+      "to": "storage",
+      "type": "data"
+    },
+    {
+      "id": "edge-5",
+      "from": "gcr",
+      "to": "cloudrun",
+      "type": "data",
+      "label": "deploy"
+    },
+    {
+      "id": "edge-6",
+      "from": "cloudrun",
+      "to": "firestore",
+      "type": "primary",
+      "label": "Admin SDK"
+    },
+    {
+      "id": "edge-7",
+      "from": "cloudrun",
+      "to": "fbauth",
+      "type": "data",
+      "label": "verifyIdToken"
+    },
+    {
+      "id": "edge-8",
+      "from": "cloudrun",
+      "to": "anthropic",
+      "type": "data"
+    },
+    {
+      "id": "edge-9",
+      "from": "cloudrun",
+      "to": "resend",
+      "type": "data"
+    }
+  ],
+  "modules": [
+    {
+      "id": "edge",
+      "label": "Edge / CDN"
+    },
+    {
+      "id": "gcp",
+      "label": "Google Cloud"
+    },
+    {
+      "id": "firebase",
+      "label": "Firebase"
+    },
+    {
+      "id": "external",
+      "label": "Servicios externos"
+    }
+  ]
+}

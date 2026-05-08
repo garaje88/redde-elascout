@@ -1,0 +1,163 @@
+meta:
+  profile: engineering-review
+  theme: tech-blue
+  layout: horizontal
+  title: ElaScout API — Diagrama de Componentes
+  description: Routers → Controllers → Services → Firestore.
+modules:
+  - id: http
+    label: HTTP (Express)
+  - id: routes
+    label: Routers
+  - id: controllers
+    label: Controllers
+  - id: services
+    label: Services
+  - id: data
+    label: Datos / Externos
+nodes:
+  - id: app
+    label: |-
+      Express App
+      src/index.ts
+      CORS + JSON
+    type: service
+    module: http
+  - id: health
+    label: /api/health
+    type: service
+    module: http
+  - id: rauth
+    label: /api/auth
+    type: service
+    module: routes
+  - id: rath
+    label: /api/athletes
+    type: service
+    module: routes
+  - id: rev
+    label: /api/evaluations
+    type: service
+    module: routes
+  - id: rrep
+    label: /api/reports
+    type: service
+    module: routes
+  - id: cauth
+    label: auth.controller
+    type: service
+    module: controllers
+  - id: cath
+    label: athlete.controller
+    type: service
+    module: controllers
+  - id: cev
+    label: evaluation.controller
+    type: service
+    module: controllers
+  - id: crep
+    label: report.controller
+    type: service
+    module: controllers
+  - id: suser
+    label: |-
+      user.service
+      findOrCreateUser
+    type: service
+    module: services
+  - id: sath
+    label: |-
+      athlete.service
+      CRUD + filters
+    type: service
+    module: services
+  - id: sev
+    label: |-
+      evaluation.service
+      scores + agregados
+    type: service
+    module: services
+  - id: srep
+    label: |-
+      report.service
+      Claude + Puppeteer + Resend
+    type: service
+    module: services
+  - id: fs
+    label: |-
+      Firestore
+      (Admin SDK)
+    type: database
+    module: data
+  - id: claude
+    label: |-
+      Anthropic
+      Claude Haiku 4.5
+    type: service
+    module: data
+  - id: resend
+    label: |-
+      Resend
+      Email + PDF
+    type: service
+    module: data
+edges:
+  - from: app
+    to: rauth
+    type: primary
+  - from: app
+    to: rath
+    type: primary
+  - from: app
+    to: rev
+    type: primary
+  - from: app
+    to: rrep
+    type: primary
+  - from: app
+    to: health
+    type: optional
+  - from: rauth
+    to: cauth
+    type: primary
+  - from: rath
+    to: cath
+    type: primary
+  - from: rev
+    to: cev
+    type: primary
+  - from: rrep
+    to: crep
+    type: primary
+  - from: cauth
+    to: suser
+    type: primary
+  - from: cath
+    to: sath
+    type: primary
+  - from: cev
+    to: sev
+    type: primary
+  - from: crep
+    to: srep
+    type: primary
+  - from: suser
+    to: fs
+    type: data
+  - from: sath
+    to: fs
+    type: data
+  - from: sev
+    to: fs
+    type: data
+  - from: srep
+    to: fs
+    type: data
+  - from: srep
+    to: claude
+    type: data
+    label: messages.create
+  - from: srep
+    to: resend
+    type: data
+    label: emails.send

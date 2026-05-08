@@ -1,0 +1,105 @@
+meta:
+  profile: engineering-review
+  theme: tech-blue
+  layout: horizontal
+  title: ElaScout — Diagrama de Contenedores (C4 Nivel 2)
+  description: Frontend Next.js, Backend Express y servicios Firebase.
+modules:
+  - id: client
+    label: Cliente
+  - id: edge
+    label: Frontend (Vercel / Cloudflare Pages)
+  - id: api
+    label: Backend (Cloud Run)
+  - id: gcp
+    label: Firebase / Google Cloud
+nodes:
+  - id: browser
+    label: |-
+      Browser
+      (Scout / Coach)
+    type: user
+    module: client
+  - id: web
+    label: |-
+      elascout-web
+      Next.js 14 App Router
+      Auth.js v5 + Tailwind
+    type: service
+    module: edge
+  - id: middleware
+    label: |-
+      Middleware
+      (Edge runtime)
+      Protección de rutas
+    type: service
+    module: edge
+  - id: express
+    label: |-
+      elascout-api
+      Express + Node 20
+    type: service
+    module: api
+  - id: authmw
+    label: |-
+      authMiddleware
+      (Firebase + Google OIDC)
+    type: service
+    module: api
+  - id: reportsvc
+    label: |-
+      Report Service
+      Claude + Puppeteer + Resend
+    type: service
+    module: api
+  - id: fbauth
+    label: Firebase Auth
+    type: service
+    module: gcp
+  - id: firestore
+    label: |-
+      Firestore
+      (NoSQL)
+    type: database
+    module: gcp
+  - id: storage
+    label: |-
+      Firebase Storage
+      athletes/photos/{uid}
+    type: database
+    module: gcp
+edges:
+  - from: browser
+    to: middleware
+    type: primary
+    label: HTTPS
+  - from: middleware
+    to: web
+    type: primary
+  - from: web
+    to: express
+    type: primary
+    label: Bearer JWT
+  - from: web
+    to: fbauth
+    type: data
+    label: signInWithCredential
+  - from: web
+    to: storage
+    type: data
+    label: Upload fotos
+  - from: express
+    to: authmw
+    type: primary
+  - from: authmw
+    to: fbauth
+    type: data
+    label: verifyIdToken
+  - from: express
+    to: firestore
+    type: primary
+    label: Admin SDK
+  - from: reportsvc
+    to: firestore
+    type: data
+    label: Reports state

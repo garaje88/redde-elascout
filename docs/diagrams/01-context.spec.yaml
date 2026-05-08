@@ -1,0 +1,69 @@
+meta:
+  profile: engineering-review
+  theme: tech-blue
+  layout: horizontal
+  title: ElaScout — Diagrama de Contexto (C4 Nivel 1)
+  description: Actores y sistemas externos que interactúan con la plataforma ElaScout.
+modules:
+  - id: actors
+    label: Actores
+  - id: platform
+    label: ElaScout Platform
+  - id: external
+    label: Servicios externos
+nodes:
+  - id: scout
+    label: Scout / Coach / Admin
+    type: user
+    module: actors
+  - id: elascout
+    label: |-
+      ElaScout
+      (Plataforma SaaS)
+    type: service
+    module: platform
+  - id: google
+    label: |-
+      Google OAuth
+      (Identity Provider)
+    type: service
+    module: external
+  - id: anthropic
+    label: |-
+      Anthropic Claude API
+      (Generación de reportes)
+    type: service
+    module: external
+  - id: resend
+    label: |-
+      Resend
+      (Email transaccional)
+    type: service
+    module: external
+  - id: firebase
+    label: |-
+      Firebase
+      (Auth + Firestore + Storage)
+    type: database
+    module: external
+edges:
+  - from: scout
+    to: elascout
+    type: primary
+    label: HTTPS (UI web)
+  - from: elascout
+    to: google
+    type: primary
+    label: OAuth 2.0
+  - from: elascout
+    to: anthropic
+    type: data
+    label: Prompts / HTML
+  - from: elascout
+    to: resend
+    type: data
+    label: Emails + PDF
+  - from: elascout
+    to: firebase
+    type: primary
+    label: SDK + Admin SDK

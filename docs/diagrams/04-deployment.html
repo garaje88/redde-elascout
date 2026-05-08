@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElaScout — Diagrama de Despliegue</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #020617;
+      min-height: 100vh;
+      padding: 2rem;
+      color: white;
+    }
+    .container { max-width: 1280px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot {
+      width: 12px; height: 12px;
+      background: #fbbf24; border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .level-badge {
+      display: inline-block; padding: 2px 8px;
+      background: rgba(251, 191, 36, 0.1);
+      border: 1px solid #fbbf24;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: #fbbf24;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 1rem;
+      border: 1px solid #1e293b;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    svg { width: 100%; min-width: 1100px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid #1e293b;
+      padding: 1.25rem;
+    }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer {
+      text-align: center; margin-top: 1.5rem;
+      color: #475569; font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>ElaScout — Diagrama de Despliegue<span class="level-badge">Infrastructure</span></h1>
+      </div>
+      <p class="subtitle">Edge frontend · Cloud Run backend · Firebase data plane · Servicios externos</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1200 760">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <marker id="ar-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee" />
+          </marker>
+          <marker id="ar-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#34d399" />
+          </marker>
+          <marker id="ar-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa" />
+          </marker>
+          <marker id="ar-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24" />
+          </marker>
+          <marker id="ar-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- ===================== ZONE BOUNDARIES ===================== -->
+        <!-- Edge / CDN -->
+        <rect x="40" y="80" width="280" height="600" rx="12" fill="rgba(34, 211, 238, 0.04)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="52" y="100" fill="#22d3ee" font-size="11" font-weight="700">EDGE / CDN</text>
+        <text x="52" y="115" fill="#475569" font-size="8">Vercel · Cloudflare</text>
+
+        <!-- Google Cloud -->
+        <rect x="360" y="80" width="280" height="600" rx="12" fill="rgba(52, 211, 153, 0.04)" stroke="#34d399" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="372" y="100" fill="#34d399" font-size="11" font-weight="700">GOOGLE CLOUD</text>
+        <text x="372" y="115" fill="#475569" font-size="8">Cloud Run · GCR · region us-central1</text>
+
+        <!-- Firebase -->
+        <rect x="680" y="80" width="280" height="600" rx="12" fill="rgba(167, 139, 250, 0.04)" stroke="#a78bfa" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="692" y="100" fill="#a78bfa" font-size="11" font-weight="700">FIREBASE</text>
+        <text x="692" y="115" fill="#475569" font-size="8">Auth · Firestore · Storage</text>
+
+        <!-- External services -->
+        <rect x="1000" y="80" width="160" height="600" rx="12" fill="rgba(251, 191, 36, 0.04)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
+        <text x="1012" y="100" fill="#fbbf24" font-size="11" font-weight="700">SaaS</text>
+        <text x="1012" y="115" fill="#475569" font-size="8">3rd party</text>
+
+        <!-- ===================== ARROWS (drawn first) ===================== -->
+        <!-- Vercel → Cloud Run -->
+        <line x1="280" y1="220" x2="378" y2="380" stroke="#22d3ee" stroke-width="2" marker-end="url(#ar-cyan)"/>
+        <text x="320" y="290" fill="#22d3ee" font-size="9" font-weight="600" text-anchor="middle">HTTPS</text>
+        <text x="320" y="305" fill="#94a3b8" font-size="8" text-anchor="middle">Bearer JWT</text>
+
+        <!-- Cloudflare Pages → Cloud Run (alt) -->
+        <line x1="280" y1="370" x2="378" y2="395" stroke="#22d3ee" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#ar-cyan)"/>
+        <text x="328" y="378" fill="#475569" font-size="7" text-anchor="middle">alt</text>
+
+        <!-- Vercel → Firebase Auth -->
+        <path d="M 280 200 Q 500 140 698 195" fill="none" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#ar-rose)"/>
+        <text x="495" y="135" fill="#fb7185" font-size="9" text-anchor="middle" font-weight="600">signInWithPopup</text>
+
+        <!-- Vercel → Storage -->
+        <path d="M 280 250 Q 480 600 698 555" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#ar-violet)"/>
+        <text x="490" y="630" fill="#a78bfa" font-size="9" text-anchor="middle" font-weight="600">upload fotos</text>
+
+        <!-- GCR → Cloud Run (deploy) -->
+        <line x1="500" y1="245" x2="500" y2="355" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#ar-amber)"/>
+        <text x="540" y="305" fill="#fbbf24" font-size="9" font-weight="600">deploy</text>
+        <text x="540" y="320" fill="#94a3b8" font-size="8">image pull</text>
+
+        <!-- Cloud Run → Firestore -->
+        <line x1="618" y1="395" x2="698" y2="370" stroke="#a78bfa" stroke-width="2" marker-end="url(#ar-violet)"/>
+        <text x="658" y="368" fill="#a78bfa" font-size="9" font-weight="600">Admin SDK</text>
+
+        <!-- Cloud Run → Firebase Auth -->
+        <line x1="618" y1="375" x2="698" y2="220" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#ar-rose)"/>
+        <text x="678" y="280" fill="#fb7185" font-size="9" font-weight="600">verifyIdToken</text>
+
+        <!-- Cloud Run → Anthropic -->
+        <line x1="618" y1="430" x2="998" y2="240" stroke="#34d399" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#ar-emerald)"/>
+        <text x="830" y="318" fill="#34d399" font-size="9" font-weight="600">Claude API</text>
+
+        <!-- Cloud Run → Resend -->
+        <line x1="618" y1="450" x2="998" y2="510" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#ar-amber)"/>
+        <text x="800" y="500" fill="#fbbf24" font-size="9" font-weight="600">Resend SMTP</text>
+
+        <!-- Devs → GCR -->
+        <line x1="500" y1="155" x2="500" y2="172" stroke="#94a3b8" stroke-width="1" marker-end="url(#arrowhead)"/>
+
+        <!-- ===================== NODES ===================== -->
+        <!-- Vercel -->
+        <rect x="60" y="170" width="220" height="100" rx="8" fill="#0f172a"/>
+        <rect x="60" y="170" width="220" height="100" rx="8" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="2"/>
+        <circle cx="85" cy="195" r="10" fill="rgba(34, 211, 238, 0.2)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="85" y="199" fill="#22d3ee" font-size="11" font-weight="700" text-anchor="middle">▲</text>
+        <text x="180" y="197" fill="white" font-size="13" font-weight="700" text-anchor="middle">Vercel</text>
+        <text x="180" y="215" fill="#22d3ee" font-size="10" text-anchor="middle">elascout-web</text>
+        <text x="170" y="235" fill="#94a3b8" font-size="9" text-anchor="middle">Next.js 14 SSR + Edge</text>
+        <text x="170" y="250" fill="#94a3b8" font-size="9" text-anchor="middle">CDN global · auto-scale</text>
+        <text x="170" y="263" fill="#475569" font-size="8" text-anchor="middle">elascout-web.vercel.app</text>
+
+        <!-- Cloudflare Pages -->
+        <rect x="60" y="320" width="220" height="80" rx="8" fill="#0f172a"/>
+        <rect x="60" y="320" width="220" height="80" rx="8" fill="rgba(8, 51, 68, 0.3)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="3,3"/>
+        <text x="170" y="345" fill="white" font-size="11" font-weight="600" text-anchor="middle">Cloudflare Pages</text>
+        <text x="170" y="362" fill="#94a3b8" font-size="9" text-anchor="middle">alternativa al edge</text>
+        <text x="170" y="382" fill="#475569" font-size="8" text-anchor="middle">opcional · disaster recovery</text>
+
+        <!-- DNS / TLS / Browser badge -->
+        <rect x="60" y="440" width="220" height="60" rx="6" fill="#0f172a"/>
+        <rect x="60" y="440" width="220" height="60" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="170" y="462" fill="white" font-size="10" font-weight="600" text-anchor="middle">Browser (clientes)</text>
+        <text x="170" y="478" fill="#94a3b8" font-size="9" text-anchor="middle">DNS · TLS 1.3 · HTTP/3</text>
+        <text x="170" y="492" fill="#475569" font-size="8" text-anchor="middle">scout · coach · admin</text>
+
+        <!-- Devs / GitHub Actions -->
+        <rect x="380" y="135" width="240" height="50" rx="6" fill="#0f172a"/>
+        <rect x="380" y="135" width="240" height="50" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="500" y="155" fill="white" font-size="10" font-weight="600" text-anchor="middle">GitHub Actions / CI</text>
+        <text x="500" y="172" fill="#94a3b8" font-size="9" text-anchor="middle">build · test · push image</text>
+
+        <!-- GCR -->
+        <rect x="380" y="195" width="240" height="60" rx="6" fill="#0f172a"/>
+        <rect x="380" y="195" width="240" height="60" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="500" y="218" fill="white" font-size="11" font-weight="600" text-anchor="middle">Google Container Registry</text>
+        <text x="500" y="235" fill="#94a3b8" font-size="9" text-anchor="middle">elascout-api:tag</text>
+        <text x="500" y="248" fill="#a78bfa" font-size="8" text-anchor="middle">gcr.io/elascout/api</text>
+
+        <!-- Cloud Run -->
+        <rect x="380" y="355" width="240" height="160" rx="8" fill="#0f172a"/>
+        <rect x="380" y="355" width="240" height="160" rx="8" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="2"/>
+        <circle cx="405" cy="380" r="10" fill="rgba(52, 211, 153, 0.2)" stroke="#34d399" stroke-width="1"/>
+        <text x="405" y="384" fill="#34d399" font-size="11" font-weight="700" text-anchor="middle">⚙</text>
+        <text x="500" y="383" fill="white" font-size="13" font-weight="700" text-anchor="middle">Cloud Run</text>
+        <text x="500" y="402" fill="#34d399" font-size="10" text-anchor="middle">elascout-api</text>
+        <line x1="400" y1="412" x2="600" y2="412" stroke="#1e293b" stroke-width="0.5"/>
+        <text x="500" y="430" fill="#94a3b8" font-size="9" text-anchor="middle">• Docker · Node 20</text>
+        <text x="500" y="445" fill="#94a3b8" font-size="9" text-anchor="middle">• Auto-scale 0..N</text>
+        <text x="500" y="460" fill="#94a3b8" font-size="9" text-anchor="middle">• HTTPS gestionado</text>
+        <text x="500" y="475" fill="#94a3b8" font-size="9" text-anchor="middle">• Secrets Manager</text>
+        <text x="500" y="495" fill="#34d399" font-size="8" text-anchor="middle">elascout-api-xxxx.a.run.app</text>
+
+        <!-- Secret Manager -->
+        <rect x="380" y="555" width="240" height="60" rx="6" fill="#0f172a"/>
+        <rect x="380" y="555" width="240" height="60" rx="6" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="500" y="577" fill="white" font-size="11" font-weight="600" text-anchor="middle">Secret Manager</text>
+        <text x="500" y="594" fill="#94a3b8" font-size="9" text-anchor="middle">SA keys · API keys</text>
+        <text x="500" y="608" fill="#fb7185" font-size="8" text-anchor="middle">FIREBASE_SA · ANTHROPIC · RESEND</text>
+
+        <!-- Firebase Auth -->
+        <rect x="700" y="170" width="240" height="80" rx="8" fill="#0f172a"/>
+        <rect x="700" y="170" width="240" height="80" rx="8" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <text x="820" y="195" fill="white" font-size="11" font-weight="600" text-anchor="middle">Firebase Auth</text>
+        <text x="820" y="213" fill="#94a3b8" font-size="9" text-anchor="middle">Identity Platform</text>
+        <text x="820" y="232" fill="#fb7185" font-size="8" text-anchor="middle">federación Google OAuth</text>
+
+        <!-- Firestore -->
+        <rect x="700" y="290" width="240" height="160" rx="8" fill="#0f172a"/>
+        <rect x="700" y="290" width="240" height="160" rx="8" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="2"/>
+        <text x="820" y="316" fill="white" font-size="13" font-weight="700" text-anchor="middle">Firestore</text>
+        <text x="820" y="334" fill="#a78bfa" font-size="10" text-anchor="middle">NoSQL · multi-region</text>
+        <line x1="720" y1="345" x2="920" y2="345" stroke="#1e293b" stroke-width="0.5"/>
+        <text x="820" y="363" fill="#94a3b8" font-size="9" text-anchor="middle">• Security Rules</text>
+        <text x="820" y="378" fill="#94a3b8" font-size="9" text-anchor="middle">• Composite indexes</text>
+        <text x="820" y="393" fill="#94a3b8" font-size="9" text-anchor="middle">• Backups diarios</text>
+        <text x="820" y="408" fill="#94a3b8" font-size="9" text-anchor="middle">• TTL en sesiones</text>
+        <text x="820" y="430" fill="#a78bfa" font-size="8" text-anchor="middle">elascout-prod.firestore</text>
+
+        <!-- Firebase Storage -->
+        <rect x="700" y="490" width="240" height="100" rx="8" fill="#0f172a"/>
+        <rect x="700" y="490" width="240" height="100" rx="8" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <text x="820" y="515" fill="white" font-size="11" font-weight="600" text-anchor="middle">Firebase Storage</text>
+        <text x="820" y="533" fill="#94a3b8" font-size="9" text-anchor="middle">Object Storage (GCS)</text>
+        <text x="820" y="552" fill="#a78bfa" font-size="9" text-anchor="middle">• athletes/photos/{uid}/*</text>
+        <text x="820" y="567" fill="#a78bfa" font-size="9" text-anchor="middle">• reports/pdf/{reportId}</text>
+        <text x="820" y="582" fill="#475569" font-size="8" text-anchor="middle">CDN edge cache</text>
+
+        <!-- Anthropic -->
+        <rect x="1010" y="180" width="140" height="100" rx="8" fill="#0f172a"/>
+        <rect x="1010" y="180" width="140" height="100" rx="8" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <circle cx="1080" cy="210" r="14" fill="rgba(52, 211, 153, 0.2)" stroke="#34d399" stroke-width="1"/>
+        <text x="1080" y="215" fill="#34d399" font-size="13" font-weight="700" text-anchor="middle">A</text>
+        <text x="1080" y="245" fill="white" font-size="11" font-weight="600" text-anchor="middle">Anthropic</text>
+        <text x="1080" y="261" fill="#94a3b8" font-size="9" text-anchor="middle">Claude API</text>
+        <text x="1080" y="275" fill="#34d399" font-size="8" text-anchor="middle">haiku-4-5</text>
+
+        <!-- Resend -->
+        <rect x="1010" y="450" width="140" height="100" rx="8" fill="#0f172a"/>
+        <rect x="1010" y="450" width="140" height="100" rx="8" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <circle cx="1080" cy="480" r="14" fill="rgba(251, 191, 36, 0.2)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="1080" y="485" fill="#fbbf24" font-size="13" font-weight="700" text-anchor="middle">@</text>
+        <text x="1080" y="515" fill="white" font-size="11" font-weight="600" text-anchor="middle">Resend</text>
+        <text x="1080" y="531" fill="#94a3b8" font-size="9" text-anchor="middle">Email + PDF</text>
+        <text x="1080" y="545" fill="#fbbf24" font-size="8" text-anchor="middle">SMTP API</text>
+
+        <!-- ===================== LEGEND ===================== -->
+        <text x="60" y="720" fill="white" font-size="10" font-weight="600">Leyenda:</text>
+        <rect x="140" y="713" width="14" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="160" y="722" fill="#94a3b8" font-size="9">Edge / CDN</text>
+        <rect x="240" y="713" width="14" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+        <text x="260" y="722" fill="#94a3b8" font-size="9">Compute</text>
+        <rect x="340" y="713" width="14" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="360" y="722" fill="#94a3b8" font-size="9">Datos</text>
+        <rect x="430" y="713" width="14" height="10" rx="2" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1"/>
+        <text x="450" y="722" fill="#94a3b8" font-size="9">Identidad / Secretos</text>
+        <rect x="595" y="713" width="14" height="10" rx="2" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
+        <text x="615" y="722" fill="#94a3b8" font-size="9">SaaS externo</text>
+        <line x1="720" y1="718" x2="745" y2="718" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,5"/>
+        <text x="753" y="722" fill="#94a3b8" font-size="9">Auth flow</text>
+        <line x1="830" y1="718" x2="855" y2="718" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <text x="863" y="722" fill="#94a3b8" font-size="9">Pipeline / despliegue</text>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>Edge / Frontend</h3>
+        </div>
+        <ul>
+          <li>• Vercel: Next.js 14 con SSR + Edge runtime</li>
+          <li>• CDN global · TLS 1.3 gestionado</li>
+          <li>• Cloudflare Pages como alternativa</li>
+          <li>• Deploy automático via GitHub Actions</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>Compute / Backend</h3>
+        </div>
+        <ul>
+          <li>• Cloud Run (serverless containers)</li>
+          <li>• Auto-scale 0..N · cold-start aceptable</li>
+          <li>• GCR como registro de imágenes</li>
+          <li>• Secret Manager para API keys</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot violet"></div>
+          <h3>Datos &amp; Externos</h3>
+        </div>
+        <ul>
+          <li>• Firestore: rules + composite indexes</li>
+          <li>• Firebase Storage: fotos atletas + PDFs</li>
+          <li>• Firebase Auth: federación Google OAuth</li>
+          <li>• Anthropic Claude · Resend SMTP</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer">
+      ElaScout · Diagrama de Despliegue · Generado con architecture-diagram skill
+    </p>
+  </div>
+</body>
+</html>

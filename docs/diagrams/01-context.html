@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElaScout — Diagrama de Contexto (C4 L1)</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #020617;
+      min-height: 100vh;
+      padding: 2rem;
+      color: white;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .pulse-dot {
+      width: 12px; height: 12px;
+      background: #22d3ee; border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .level-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(34, 211, 238, 0.1);
+      border: 1px solid #22d3ee;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: #22d3ee;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 1rem;
+      border: 1px solid #1e293b;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 0.75rem;
+      border: 1px solid #1e293b;
+      padding: 1.25rem;
+    }
+    .card-header {
+      display: flex; align-items: center;
+      gap: 0.5rem; margin-bottom: 0.75rem;
+    }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #475569;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>ElaScout — Diagrama de Contexto<span class="level-badge">C4 · Nivel 1</span></h1>
+      </div>
+      <p class="subtitle">Actores y sistemas externos que interactúan con la plataforma ElaScout</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1100 620">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <marker id="arrowhead-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee" />
+          </marker>
+          <marker id="arrowhead-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185" />
+          </marker>
+          <marker id="arrowhead-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#34d399" />
+          </marker>
+          <marker id="arrowhead-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Module Labels -->
+        <text x="100" y="40" fill="#64748b" font-size="10" font-weight="600" text-anchor="middle">ACTORES</text>
+        <text x="500" y="40" fill="#64748b" font-size="10" font-weight="600" text-anchor="middle">PLATAFORMA</text>
+        <text x="900" y="40" fill="#64748b" font-size="10" font-weight="600" text-anchor="middle">SERVICIOS EXTERNOS</text>
+
+        <!-- Module separators -->
+        <line x1="200" y1="60" x2="200" y2="580" stroke="#1e293b" stroke-width="1" stroke-dasharray="2,4"/>
+        <line x1="800" y1="60" x2="800" y2="580" stroke="#1e293b" stroke-width="1" stroke-dasharray="2,4"/>
+
+        <!-- ===================== ARROWS (drawn first) ===================== -->
+        <!-- Scout → ElaScout -->
+        <line x1="170" y1="305" x2="378" y2="305" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrowhead-cyan)"/>
+        <text x="274" y="295" fill="#22d3ee" font-size="10" text-anchor="middle" font-weight="600">HTTPS</text>
+        <text x="274" y="320" fill="#94a3b8" font-size="8" text-anchor="middle">UI Web (Next.js)</text>
+
+        <!-- ElaScout → Google OAuth -->
+        <line x1="622" y1="170" x2="828" y2="130" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrowhead-rose)"/>
+        <text x="725" y="142" fill="#fb7185" font-size="9" text-anchor="middle" font-weight="600">OAuth 2.0</text>
+
+        <!-- ElaScout → Firebase -->
+        <line x1="622" y1="260" x2="828" y2="260" stroke="#a78bfa" stroke-width="2" marker-end="url(#arrowhead)"/>
+        <text x="725" y="252" fill="#a78bfa" font-size="9" text-anchor="middle" font-weight="600">SDK + Admin SDK</text>
+
+        <!-- ElaScout → Anthropic -->
+        <line x1="622" y1="370" x2="828" y2="395" stroke="#34d399" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrowhead-emerald)"/>
+        <text x="725" y="375" fill="#34d399" font-size="9" text-anchor="middle" font-weight="600">Prompts → HTML</text>
+
+        <!-- ElaScout → Resend -->
+        <line x1="622" y1="430" x2="828" y2="510" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrowhead-amber)"/>
+        <text x="730" y="478" fill="#fbbf24" font-size="9" text-anchor="middle" font-weight="600">Emails + PDF</text>
+
+        <!-- ===================== NODES ===================== -->
+        <!-- Scout/Coach (Actor) -->
+        <rect x="40" y="240" width="130" height="130" rx="8" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+        <!-- Person icon -->
+        <circle cx="105" cy="275" r="14" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+        <path d="M 85 320 Q 85 295 105 295 Q 125 295 125 320" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="105" y="345" fill="white" font-size="11" font-weight="600" text-anchor="middle">Scout / Coach</text>
+        <text x="105" y="358" fill="#94a3b8" font-size="9" text-anchor="middle">/ Admin Club</text>
+
+        <!-- ElaScout Platform (center) -->
+        <rect x="240" y="180" width="380" height="280" rx="12" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="2"/>
+        <circle cx="430" cy="220" r="18" fill="rgba(34, 211, 238, 0.2)" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="430" y="226" fill="#22d3ee" font-size="14" font-weight="700" text-anchor="middle">E</text>
+        <text x="430" y="270" fill="white" font-size="18" font-weight="700" text-anchor="middle">ElaScout</text>
+        <text x="430" y="290" fill="#22d3ee" font-size="10" text-anchor="middle">Athlete Intelligence Platform</text>
+        <text x="430" y="320" fill="#94a3b8" font-size="9" text-anchor="middle">Plataforma SaaS para gestión, evaluación</text>
+        <text x="430" y="334" fill="#94a3b8" font-size="9" text-anchor="middle">y análisis de deportistas de alto rendimiento</text>
+        <!-- Inner badges -->
+        <rect x="280" y="360" width="80" height="20" rx="4" fill="rgba(34, 211, 238, 0.1)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="320" y="374" fill="#22d3ee" font-size="9" text-anchor="middle">Frontend</text>
+        <rect x="370" y="360" width="80" height="20" rx="4" fill="rgba(52, 211, 153, 0.1)" stroke="#34d399" stroke-width="1"/>
+        <text x="410" y="374" fill="#34d399" font-size="9" text-anchor="middle">Backend</text>
+        <rect x="460" y="360" width="100" height="20" rx="4" fill="rgba(167, 139, 250, 0.1)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="510" y="374" fill="#a78bfa" font-size="9" text-anchor="middle">Persistence</text>
+        <text x="430" y="410" fill="#475569" font-size="8" text-anchor="middle">Módulos: M1 Personal · M2 Profesional · M3 Historial</text>
+        <text x="430" y="424" fill="#475569" font-size="8" text-anchor="middle">M4 Títulos · M5 Físico · M6 Evaluaciones</text>
+
+        <!-- Google OAuth -->
+        <rect x="830" y="90" width="220" height="80" rx="8" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+        <circle cx="855" cy="115" r="10" fill="#fb7185" opacity="0.3"/>
+        <text x="855" y="119" fill="#fb7185" font-size="11" font-weight="700" text-anchor="middle">G</text>
+        <text x="950" y="118" fill="white" font-size="11" font-weight="600" text-anchor="middle">Google OAuth</text>
+        <text x="950" y="135" fill="#94a3b8" font-size="9" text-anchor="middle">Identity Provider</text>
+        <text x="950" y="155" fill="#fb7185" font-size="8" text-anchor="middle">accounts.google.com</text>
+
+        <!-- Firebase -->
+        <rect x="830" y="220" width="220" height="80" rx="8" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="845" y="245" width="20" height="22" rx="2" fill="#a78bfa" opacity="0.3"/>
+        <text x="855" y="261" fill="#a78bfa" font-size="11" font-weight="700" text-anchor="middle">🔥</text>
+        <text x="950" y="248" fill="white" font-size="11" font-weight="600" text-anchor="middle">Firebase</text>
+        <text x="950" y="265" fill="#94a3b8" font-size="9" text-anchor="middle">Auth · Firestore · Storage</text>
+        <text x="950" y="285" fill="#a78bfa" font-size="8" text-anchor="middle">Google Cloud · NoSQL</text>
+
+        <!-- Anthropic -->
+        <rect x="830" y="350" width="220" height="80" rx="8" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+        <circle cx="855" cy="375" r="10" fill="#34d399" opacity="0.2"/>
+        <text x="855" y="379" fill="#34d399" font-size="11" font-weight="700" text-anchor="middle">A</text>
+        <text x="950" y="378" fill="white" font-size="11" font-weight="600" text-anchor="middle">Anthropic Claude</text>
+        <text x="950" y="395" fill="#94a3b8" font-size="9" text-anchor="middle">Generación de reportes IA</text>
+        <text x="950" y="415" fill="#34d399" font-size="8" text-anchor="middle">claude-haiku-4-5</text>
+
+        <!-- Resend -->
+        <rect x="830" y="480" width="220" height="80" rx="8" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+        <circle cx="855" cy="505" r="10" fill="#fbbf24" opacity="0.3"/>
+        <text x="855" y="509" fill="#fbbf24" font-size="11" font-weight="700" text-anchor="middle">@</text>
+        <text x="950" y="508" fill="white" font-size="11" font-weight="600" text-anchor="middle">Resend</text>
+        <text x="950" y="525" fill="#94a3b8" font-size="9" text-anchor="middle">Email transaccional</text>
+        <text x="950" y="545" fill="#fbbf24" font-size="8" text-anchor="middle">SMTP API · PDF Adjunto</text>
+
+        <!-- ===================== LEGEND ===================== -->
+        <text x="40" y="600" fill="white" font-size="10" font-weight="600">Leyenda:</text>
+        <line x1="120" y1="596" x2="145" y2="596" stroke="#22d3ee" stroke-width="2"/>
+        <text x="153" y="600" fill="#94a3b8" font-size="9">Flujo principal</text>
+        <line x1="265" y1="596" x2="290" y2="596" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,5"/>
+        <text x="298" y="600" fill="#94a3b8" font-size="9">Auth / Seguridad</text>
+        <line x1="410" y1="596" x2="435" y2="596" stroke="#34d399" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <text x="443" y="600" fill="#94a3b8" font-size="9">Datos (IA)</text>
+        <line x1="525" y1="596" x2="550" y2="596" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <text x="558" y="600" fill="#94a3b8" font-size="9">Datos (Email)</text>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>Actores Principales</h3>
+        </div>
+        <ul>
+          <li>• Scout deportivo</li>
+          <li>• Director técnico</li>
+          <li>• Preparador físico</li>
+          <li>• Representante / Admin de club</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot rose"></div>
+          <h3>Identidad &amp; Seguridad</h3>
+        </div>
+        <ul>
+          <li>• Google OAuth 2.0 (login)</li>
+          <li>• Auth.js v5 en frontend</li>
+          <li>• Firebase Admin SDK en backend</li>
+          <li>• JWT Bearer en cada request</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot violet"></div>
+          <h3>Servicios Externos</h3>
+        </div>
+        <ul>
+          <li>• Firebase (Auth + Firestore + Storage)</li>
+          <li>• Anthropic Claude — reportes IA</li>
+          <li>• Resend — email + PDF adjunto</li>
+          <li>• Google Cloud (Cloud Run)</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer">
+      ElaScout · C4 Model — Nivel 1 (Contexto) · Generado con architecture-diagram skill
+    </p>
+  </div>
+</body>
+</html>
