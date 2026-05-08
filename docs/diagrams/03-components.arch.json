@@ -1,0 +1,258 @@
+{
+  "version": 1,
+  "title": "ElaScout API — Diagrama de Componentes",
+  "type": "engineering-diagram",
+  "source": "generated",
+  "profile": "engineering-review",
+  "theme": "tech-blue",
+  "layout": "horizontal",
+  "counts": {
+    "nodes": 17,
+    "edges": 19,
+    "modules": 5
+  },
+  "nodes": [
+    {
+      "id": "app",
+      "label": "Express App\nsrc/index.ts\nCORS + JSON",
+      "type": "service",
+      "module": "http"
+    },
+    {
+      "id": "health",
+      "label": "/api/health",
+      "type": "service",
+      "module": "http"
+    },
+    {
+      "id": "rauth",
+      "label": "/api/auth",
+      "type": "service",
+      "module": "routes"
+    },
+    {
+      "id": "rath",
+      "label": "/api/athletes",
+      "type": "service",
+      "module": "routes"
+    },
+    {
+      "id": "rev",
+      "label": "/api/evaluations",
+      "type": "service",
+      "module": "routes"
+    },
+    {
+      "id": "rrep",
+      "label": "/api/reports",
+      "type": "service",
+      "module": "routes"
+    },
+    {
+      "id": "cauth",
+      "label": "auth.controller",
+      "type": "service",
+      "module": "controllers"
+    },
+    {
+      "id": "cath",
+      "label": "athlete.controller",
+      "type": "service",
+      "module": "controllers"
+    },
+    {
+      "id": "cev",
+      "label": "evaluation.controller",
+      "type": "service",
+      "module": "controllers"
+    },
+    {
+      "id": "crep",
+      "label": "report.controller",
+      "type": "service",
+      "module": "controllers"
+    },
+    {
+      "id": "suser",
+      "label": "user.service\nfindOrCreateUser",
+      "type": "service",
+      "module": "services"
+    },
+    {
+      "id": "sath",
+      "label": "athlete.service\nCRUD + filters",
+      "type": "service",
+      "module": "services"
+    },
+    {
+      "id": "sev",
+      "label": "evaluation.service\nscores + agregados",
+      "type": "service",
+      "module": "services"
+    },
+    {
+      "id": "srep",
+      "label": "report.service\nClaude + Puppeteer + Resend",
+      "type": "service",
+      "module": "services"
+    },
+    {
+      "id": "fs",
+      "label": "Firestore\n(Admin SDK)",
+      "type": "database",
+      "module": "data"
+    },
+    {
+      "id": "claude",
+      "label": "Anthropic\nClaude Haiku 4.5",
+      "type": "service",
+      "module": "data"
+    },
+    {
+      "id": "resend",
+      "label": "Resend\nEmail + PDF",
+      "type": "service",
+      "module": "data"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "from": "app",
+      "to": "rauth",
+      "type": "primary"
+    },
+    {
+      "id": "edge-2",
+      "from": "app",
+      "to": "rath",
+      "type": "primary"
+    },
+    {
+      "id": "edge-3",
+      "from": "app",
+      "to": "rev",
+      "type": "primary"
+    },
+    {
+      "id": "edge-4",
+      "from": "app",
+      "to": "rrep",
+      "type": "primary"
+    },
+    {
+      "id": "edge-5",
+      "from": "app",
+      "to": "health",
+      "type": "optional"
+    },
+    {
+      "id": "edge-6",
+      "from": "rauth",
+      "to": "cauth",
+      "type": "primary"
+    },
+    {
+      "id": "edge-7",
+      "from": "rath",
+      "to": "cath",
+      "type": "primary"
+    },
+    {
+      "id": "edge-8",
+      "from": "rev",
+      "to": "cev",
+      "type": "primary"
+    },
+    {
+      "id": "edge-9",
+      "from": "rrep",
+      "to": "crep",
+      "type": "primary"
+    },
+    {
+      "id": "edge-10",
+      "from": "cauth",
+      "to": "suser",
+      "type": "primary"
+    },
+    {
+      "id": "edge-11",
+      "from": "cath",
+      "to": "sath",
+      "type": "primary"
+    },
+    {
+      "id": "edge-12",
+      "from": "cev",
+      "to": "sev",
+      "type": "primary"
+    },
+    {
+      "id": "edge-13",
+      "from": "crep",
+      "to": "srep",
+      "type": "primary"
+    },
+    {
+      "id": "edge-14",
+      "from": "suser",
+      "to": "fs",
+      "type": "data"
+    },
+    {
+      "id": "edge-15",
+      "from": "sath",
+      "to": "fs",
+      "type": "data"
+    },
+    {
+      "id": "edge-16",
+      "from": "sev",
+      "to": "fs",
+      "type": "data"
+    },
+    {
+      "id": "edge-17",
+      "from": "srep",
+      "to": "fs",
+      "type": "data"
+    },
+    {
+      "id": "edge-18",
+      "from": "srep",
+      "to": "claude",
+      "type": "data",
+      "label": "messages.create"
+    },
+    {
+      "id": "edge-19",
+      "from": "srep",
+      "to": "resend",
+      "type": "data",
+      "label": "emails.send"
+    }
+  ],
+  "modules": [
+    {
+      "id": "http",
+      "label": "HTTP (Express)"
+    },
+    {
+      "id": "routes",
+      "label": "Routers"
+    },
+    {
+      "id": "controllers",
+      "label": "Controllers"
+    },
+    {
+      "id": "services",
+      "label": "Services"
+    },
+    {
+      "id": "data",
+      "label": "Datos / Externos"
+    }
+  ]
+}

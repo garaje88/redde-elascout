@@ -1,0 +1,102 @@
+meta:
+  profile: engineering-review
+  theme: tech-blue
+  layout: horizontal
+  title: ElaScout — Despliegue
+  description: Edge frontend, Cloud Run backend, Firebase data plane.
+modules:
+  - id: edge
+    label: Edge / CDN
+  - id: gcp
+    label: Google Cloud
+  - id: firebase
+    label: Firebase
+  - id: external
+    label: Servicios externos
+nodes:
+  - id: vercel
+    label: |-
+      Vercel
+      (elascout-web)
+    type: service
+    module: edge
+  - id: cfpages
+    label: |-
+      Cloudflare Pages
+      (alternativa)
+    type: service
+    module: edge
+  - id: gcr
+    label: |-
+      Google Container
+      Registry
+    type: database
+    module: gcp
+  - id: cloudrun
+    label: |-
+      Cloud Run
+      elascout-api
+      (Docker, autoscale 0..N)
+    type: service
+    module: gcp
+  - id: fbauth
+    label: Firebase Auth
+    type: service
+    module: firebase
+  - id: firestore
+    label: |-
+      Firestore
+      rules + indexes
+    type: database
+    module: firebase
+  - id: storage
+    label: |-
+      Firebase Storage
+      (fotos atletas)
+    type: database
+    module: firebase
+  - id: anthropic
+    label: |-
+      Anthropic
+      Claude API
+    type: service
+    module: external
+  - id: resend
+    label: |-
+      Resend
+      (SMTP)
+    type: service
+    module: external
+edges:
+  - from: vercel
+    to: cloudrun
+    type: primary
+    label: HTTPS
+  - from: cfpages
+    to: cloudrun
+    type: optional
+    label: HTTPS
+  - from: vercel
+    to: fbauth
+    type: data
+  - from: vercel
+    to: storage
+    type: data
+  - from: gcr
+    to: cloudrun
+    type: data
+    label: deploy
+  - from: cloudrun
+    to: firestore
+    type: primary
+    label: Admin SDK
+  - from: cloudrun
+    to: fbauth
+    type: data
+    label: verifyIdToken
+  - from: cloudrun
+    to: anthropic
+    type: data
+  - from: cloudrun
+    to: resend
+    type: data

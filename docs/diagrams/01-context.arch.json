@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "title": "ElaScout — Diagrama de Contexto (C4 Nivel 1)",
+  "type": "engineering-diagram",
+  "source": "generated",
+  "profile": "engineering-review",
+  "theme": "tech-blue",
+  "layout": "horizontal",
+  "counts": {
+    "nodes": 6,
+    "edges": 5,
+    "modules": 3
+  },
+  "nodes": [
+    {
+      "id": "scout",
+      "label": "Scout / Coach / Admin",
+      "type": "user",
+      "module": "actors"
+    },
+    {
+      "id": "elascout",
+      "label": "ElaScout\n(Plataforma SaaS)",
+      "type": "service",
+      "module": "platform"
+    },
+    {
+      "id": "google",
+      "label": "Google OAuth\n(Identity Provider)",
+      "type": "service",
+      "module": "external"
+    },
+    {
+      "id": "anthropic",
+      "label": "Anthropic Claude API\n(Generación de reportes)",
+      "type": "service",
+      "module": "external"
+    },
+    {
+      "id": "resend",
+      "label": "Resend\n(Email transaccional)",
+      "type": "service",
+      "module": "external"
+    },
+    {
+      "id": "firebase",
+      "label": "Firebase\n(Auth + Firestore + Storage)",
+      "type": "database",
+      "module": "external"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "from": "scout",
+      "to": "elascout",
+      "type": "primary",
+      "label": "HTTPS (UI web)"
+    },
+    {
+      "id": "edge-2",
+      "from": "elascout",
+      "to": "google",
+      "type": "primary",
+      "label": "OAuth 2.0"
+    },
+    {
+      "id": "edge-3",
+      "from": "elascout",
+      "to": "anthropic",
+      "type": "data",
+      "label": "Prompts / HTML"
+    },
+    {
+      "id": "edge-4",
+      "from": "elascout",
+      "to": "resend",
+      "type": "data",
+      "label": "Emails + PDF"
+    },
+    {
+      "id": "edge-5",
+      "from": "elascout",
+      "to": "firebase",
+      "type": "primary",
+      "label": "SDK + Admin SDK"
+    }
+  ],
+  "modules": [
+    {
+      "id": "actors",
+      "label": "Actores"
+    },
+    {
+      "id": "platform",
+      "label": "ElaScout Platform"
+    },
+    {
+      "id": "external",
+      "label": "Servicios externos"
+    }
+  ]
+}
